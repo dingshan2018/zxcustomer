@@ -3,6 +3,9 @@ import Vue from 'vue';
 import router from './router';
 import Axios from 'axios';
 import {
+  Row,
+  Col,
+  List,
   Button,
   Search,
   NavBar,
@@ -12,12 +15,17 @@ import {
   CellGroup,
   Tab,
   Tabs,
+  Card,
+  SubmitBar,
+  Popup,
+  NumberKeyboard,
   Icon,
   Loading,
   Toast
 } from 'vant';
 import '../../assets/js/global-tools.js';
 import BScroll from 'better-scroll';
+import 'animate.css';
 import '../../assets/css/base.less';
 import App from './App.vue';
 
@@ -27,7 +35,10 @@ Vue.prototype.$axios = Axios;
 
 Vue.prototype.$BScroll = BScroll;
 
-Vue.use(Button).
+Vue.use(Row).
+  use(Col).
+  use(List).
+  use(Button).
   use(Search).
   use(NavBar).
   use(Swipe).
@@ -36,6 +47,10 @@ Vue.use(Button).
   use(CellGroup).
   use(Tab).
   use(Tabs).
+  use(Card).
+  use(SubmitBar).
+  use(Popup).
+  use(NumberKeyboard).
   use(Icon).
   use(Loading).
   use(Toast);

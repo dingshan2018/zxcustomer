@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container" v-cloak>
+  <div class="app-container animated fadeIn faster" v-cloak>
     <div class="app-header" @touchmove.stop.prevent>
       <van-search
         v-model.trim="search"
@@ -12,20 +12,21 @@
     </div>
 
     <div class="app-main" ref="mainBScroll">
-      <div>
+      <div style="overflow: hidden;">
         <div class="scroll-loading">
           <van-loading class="loading" size="24"/>
           释放刷新...
         </div>
-        <div class="device-item" v-for="item in deviceList" @click="toDeviceDetails(item)">
-          <div class="device-img">
-            <img :src="item.img">
-          </div>
-          <div class="device-info">
-            <p class="device-title">{{item.name}}</p>
-            <p class="device-details">{{item.details}}</p>
-          </div>
-        </div>
+        <van-card
+          :price="item.price"
+          :title="item.title"
+          :thumb="item.imgSrc"
+          :origin-price="item.originPrice"
+          @click.native="toDeviceDetails(item)"
+          v-for="item in deviceList">
+          <p class="device-title van-card__title" slot="title">【{{item.tag}}】 {{item.name}}</p>
+          <p class="device-desc" slot="desc">{{item.desc}}</p>
+        </van-card>
       </div>
     </div>
   </div>
@@ -37,19 +38,19 @@
     data () {
       return {
         // 搜索
-        search       : '',
+        search             : '',
         // BScrollEx实例
-        mainBScrollEx: null,
+        mainBScrollInstance: null,
         // 设备列表
-        deviceList   : []
+        deviceList         : []
       };
     },
     watch  : {
       // 设备列表变化刷新BScroll
       deviceList (newValue, oldValue) {
-        if (this.mainBScrollEx !== null) {
-          this.mainBScrollEx.finishPullDown();
-          this.mainBScrollEx.refresh();
+        if (this.mainBScrollInstance !== null) {
+          this.mainBScrollInstance.finishPullDown();
+          this.mainBScrollInstance.refresh();
         }
       }
     },
@@ -70,65 +71,96 @@
         }).catch(function (error) {
           _this.deviceList = [
             {
-              deviceId: '001',
-              img     : 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541336099791&di=962bc16ed6ed5dc0b52239fc8e0dec65&imgtype=0&src=http%3A%2F%2Fg.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2F5243fbf2b211931376d158d568380cd790238dc1.jpg',
-              name    : '超级出纸机',
-              details : '这里可以是描述'
+              deviceId   : '001',
+              imgSrc     : 'https://via.placeholder.com/90',
+              tag        : '服务商',
+              name       : '超级出纸机',
+              desc       : '这里可以是描述',
+              price      : '2.00',
+              originPrice: '10.00'
             },
             {
-              deviceId: '002',
-              img     : 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541336099791&di=962bc16ed6ed5dc0b52239fc8e0dec65&imgtype=0&src=http%3A%2F%2Fg.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2F5243fbf2b211931376d158d568380cd790238dc1.jpg',
-              name    : '超级出纸机',
-              details : '这里可以是描述'
+              deviceId   : '001',
+              imgSrc     : 'https://via.placeholder.com/90',
+              tag        : '服务商',
+              name       : '超级出纸机',
+              desc       : '这里可以是描述',
+              price      : '2.00',
+              originPrice: '10.00'
             },
             {
-              deviceId: '003',
-              img     : 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541336099791&di=962bc16ed6ed5dc0b52239fc8e0dec65&imgtype=0&src=http%3A%2F%2Fg.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2F5243fbf2b211931376d158d568380cd790238dc1.jpg',
-              name    : '超级出纸机',
-              details : '这里可以是描述'
+              deviceId   : '001',
+              imgSrc     : 'https://via.placeholder.com/90',
+              tag        : '服务商',
+              name       : '超级出纸机',
+              desc       : '这里可以是描述',
+              price      : '2.00',
+              originPrice: '10.00'
             },
             {
-              deviceId: '004',
-              img     : 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541336099791&di=962bc16ed6ed5dc0b52239fc8e0dec65&imgtype=0&src=http%3A%2F%2Fg.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2F5243fbf2b211931376d158d568380cd790238dc1.jpg',
-              name    : '超级出纸机',
-              details : '这里可以是描述'
+              deviceId   : '001',
+              imgSrc     : 'https://via.placeholder.com/90',
+              tag        : '服务商',
+              name       : '超级出纸机',
+              desc       : '这里可以是描述',
+              price      : '2.00',
+              originPrice: '10.00'
             },
             {
-              deviceId: '005',
-              img     : 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541336099791&di=962bc16ed6ed5dc0b52239fc8e0dec65&imgtype=0&src=http%3A%2F%2Fg.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2F5243fbf2b211931376d158d568380cd790238dc1.jpg',
-              name    : '超级出纸机',
-              details : '这里可以是描述'
+              deviceId   : '001',
+              imgSrc     : 'https://via.placeholder.com/90',
+              tag        : '服务商',
+              name       : '超级出纸机',
+              desc       : '这里可以是描述',
+              price      : '2.00',
+              originPrice: '10.00'
             },
             {
-              deviceId: '006',
-              img     : 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541336099791&di=962bc16ed6ed5dc0b52239fc8e0dec65&imgtype=0&src=http%3A%2F%2Fg.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2F5243fbf2b211931376d158d568380cd790238dc1.jpg',
-              name    : '超级出纸机',
-              details : '这里可以是描述'
+              deviceId   : '001',
+              imgSrc     : 'https://via.placeholder.com/90',
+              tag        : '服务商',
+              name       : '超级出纸机',
+              desc       : '这里可以是描述',
+              price      : '2.00',
+              originPrice: '10.00'
             },
             {
-              deviceId: '007',
-              img     : 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541336099791&di=962bc16ed6ed5dc0b52239fc8e0dec65&imgtype=0&src=http%3A%2F%2Fg.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2F5243fbf2b211931376d158d568380cd790238dc1.jpg',
-              name    : '超级出纸机',
-              details : '这里可以是描述'
+              deviceId   : '001',
+              imgSrc     : 'https://via.placeholder.com/90',
+              tag        : '服务商',
+              name       : '超级出纸机',
+              desc       : '这里可以是描述',
+              price      : '2.00',
+              originPrice: '10.00'
             },
             {
-              deviceId: '008',
-              img     : 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541336099791&di=962bc16ed6ed5dc0b52239fc8e0dec65&imgtype=0&src=http%3A%2F%2Fg.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2F5243fbf2b211931376d158d568380cd790238dc1.jpg',
-              name    : '超级出纸机',
-              details : '这里可以是描述'
+              deviceId   : '001',
+              imgSrc     : 'https://via.placeholder.com/90',
+              tag        : '服务商',
+              name       : '超级出纸机',
+              desc       : '这里可以是描述',
+              price      : '2.00',
+              originPrice: '10.00'
             },
             {
-              deviceId: '009',
-              img     : 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541336099791&di=962bc16ed6ed5dc0b52239fc8e0dec65&imgtype=0&src=http%3A%2F%2Fg.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2F5243fbf2b211931376d158d568380cd790238dc1.jpg',
-              name    : '超级出纸机',
-              details : '这里可以是描述'
+              deviceId   : '001',
+              imgSrc     : 'https://via.placeholder.com/90',
+              tag        : '服务商',
+              name       : '超级出纸机',
+              desc       : '这里可以是描述',
+              price      : '2.00',
+              originPrice: '10.00'
             },
             {
-              deviceId: '010',
-              img     : 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541336099791&di=962bc16ed6ed5dc0b52239fc8e0dec65&imgtype=0&src=http%3A%2F%2Fg.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2F5243fbf2b211931376d158d568380cd790238dc1.jpg',
-              name    : '超级出纸机',
-              details : '这里可以是描述'
-            }];
+              deviceId   : '001',
+              imgSrc     : 'https://via.placeholder.com/90',
+              tag        : '服务商',
+              name       : '超级出纸机',
+              desc       : '这里可以是描述',
+              price      : '2.00',
+              originPrice: '10.00'
+            }
+          ];
         });
       },
       // 跳转详情
@@ -140,14 +172,14 @@
       let _this = this;
 
       // BScroll初始化
-      _this.mainBScrollEx = new _this.$BScroll(_this.$refs.mainBScroll, {
+      _this.mainBScrollInstance = new _this.$BScroll(_this.$refs.mainBScroll, {
         click          : true,
         pullDownRefresh: {
           threshold: 50,
           stop     : 50
         }
       });
-      _this.mainBScrollEx.on('pullingDown', function () {
+      _this.mainBScrollInstance.on('pullingDown', function () {
         _this.getDeviceList();
       });
 
@@ -193,58 +225,19 @@
     }
   }
 
-  .device-item {
-    position: relative;
-    height: 132px;
-    padding: 5px 0;
-    border-bottom: 2px solid #f2f2f2;
-    background-color: #fff;
-    overflow: hidden;
-
-    a {
-      display: block;
-      overflow: auto;
-    }
+  .device-title {
+    margin: 0;
+    font-size: 14px;
   }
 
-  .device-img {
-    float: left;
-    width: 120px;
-    height: 120px;
-    margin-right: 10px;
+  .device-desc {
+    margin: 7px 0 0 0;
+    line-height: 18px;
+    color: #666;
+    word-break: break-all;
+    display: -webkit-box;
     overflow: hidden;
-
-    img {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
-  }
-
-  .device-info {
-    display: block;
-
-    p {
-      margin: 0;
-    }
-
-    .device-title {
-      margin-top: 5px;
-      max-height: 40px;
-      line-height: 20px;
-      font-size: 16px;
-      font-weight: 600;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-    }
-
-    .device-details {
-      margin-top: 5px;
-      font-size: 14px;
-      color: #888;
-    }
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 </style>

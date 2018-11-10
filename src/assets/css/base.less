@@ -91,15 +91,10 @@ body {
   height: 100%;
 }
 
-.header-swiper {
-  height: 180px;
-  overflow: hidden;
-}
-
 .main-wrapper {
   position: relative;
   padding: 0 10px;
-  overflow: hidden auto;
+  overflow: hidden;
 }
 
 .block__clear-both::before,
@@ -117,14 +112,18 @@ body {
 
 /* 重写组件样式
  ********************/
+.van-modal {
+  z-index: 2000 !important;
+}
+
 .van-nav-bar .van-icon,
-.van-nav-bar__text{
+.van-nav-bar__text {
   color: #333;
 }
 
-.van-swipe__indicator--active{
+/*.van-swipe__indicator--active {
   background-color: @base-green;
-}
+}*/
 
 .van-dialog {
   width: 270px;
