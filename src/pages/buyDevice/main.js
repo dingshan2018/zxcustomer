@@ -2,7 +2,20 @@ import 'lib-flexible';
 import Vue from 'vue';
 import router from './router';
 import Axios from 'axios';
-import { Button, Search, NavBar, Swipe, SwipeItem, Icon, Loading, Toast } from 'vant';
+import {
+  Button,
+  Search,
+  NavBar,
+  Swipe,
+  SwipeItem,
+  Cell,
+  CellGroup,
+  Tab,
+  Tabs,
+  Icon,
+  Loading,
+  Toast
+} from 'vant';
 import '../../assets/js/global-tools.js';
 import BScroll from 'better-scroll';
 import '../../assets/css/base.less';
@@ -19,6 +32,10 @@ Vue.use(Button).
   use(NavBar).
   use(Swipe).
   use(SwipeItem).
+  use(Cell).
+  use(CellGroup).
+  use(Tab).
+  use(Tabs).
   use(Icon).
   use(Loading).
   use(Toast);

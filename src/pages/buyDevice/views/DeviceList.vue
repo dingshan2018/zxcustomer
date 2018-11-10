@@ -1,6 +1,6 @@
 <template>
   <div class="app-container" v-cloak>
-    <div class="app-header">
+    <div class="app-header" @touchmove.stop.prevent>
       <van-search
         v-model.trim="search"
         placeholder="请输入搜索关键词"
