@@ -9,7 +9,7 @@
       />
     </div>
 
-    <main class="main-wrapper" ref="mainBScroll">
+    <main class="app-main" ref="mainBScroll">
       <div class="record-list">
         <van-row class="record-list__head">
           <van-col span="6" class="van-ellipsis">购买日期</van-col>
@@ -139,8 +139,10 @@
 <style lang="less" scoped>
   @base-green: #00c292;
 
-  .main-wrapper {
+  .app-main {
+    position: relative;
     height: calc(100% - 46px);
+    padding: 0 10px;
   }
 
   .record-list {
