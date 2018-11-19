@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import DeviceList from './views/DeviceList';
+// import DeviceList from './views/DeviceList';
 import DeviceDetails from './views/DeviceDetails';
 import BuyHistory from './views/BuyHistory';
 
@@ -10,16 +10,9 @@ export default new Router({
   routes: [
     {
       path      : '/',
-      name      : 'deviceList',
+      name      : 'deviceDetails',
       components: {
-        main: DeviceList
-      }
-    },
-    {
-      path     : '/deviceDetails/:deviceId',
-      name     : 'deviceDetails',
-      components: {
-        mainSub: DeviceDetails
+        main: DeviceDetails
       }
     },
     {

@@ -4,7 +4,7 @@ module.exports = {
   // 打包路径
   outputDir: 'consumer',
   // 打包的时候将pages的注释解开
-  /*pages: {
+  pages: {
     paperOutput: {
       // page 的入口
       entry: 'src/pages/paperOutput/main.js',
@@ -14,7 +14,7 @@ module.exports = {
       filename: 'paperOutput.html',
       // 当使用 title 选项时，
       // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>
-      title: 'paperOutput'
+      title: '扫码出纸'
     },
     deviceBind: {
       // page 的入口
@@ -24,7 +24,7 @@ module.exports = {
       // 在 dist/index.html 的输出
       filename: 'deviceBind.html',
       // 当使用 title 选项时，
-      title: 'deviceBind'
+      title: '终端绑定'
     },
     buyDevice: {
       // page 的入口
@@ -34,9 +34,19 @@ module.exports = {
       // 在 dist/index.html 的输出
       filename: 'buyDevice.html',
       // 当使用 title 选项时，
-      title: 'buyDevice'
+      title: '设备购买'
     },
-  },*/
+    testPaperOutput: {
+      // page 的入口
+      entry: 'src/pages/testPaperOutput/main.js',
+      // 模板来源
+      template: 'public/index.html',
+      // 在 dist/index.html 的输出
+      filename: 'testPaperOutput.html',
+      // 当使用 title 选项时，
+      title: '测试出纸'
+    }
+  },
   // 不打包Map
   productionSourceMap: false,
   devServer: {
