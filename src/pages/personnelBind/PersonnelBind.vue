@@ -63,14 +63,25 @@
       submitClick () {
         let _this = this;
 
+        _this.$toast.loading({
+          duration   : 0,
+          forbidClick: true,
+          message    : '加载中...'
+        });
+
         _this.$axios.get('/wx/bindWxUser', {
           params: {
             userId: _this.userId,
             openId: _this.userInfo.openId
           }
-        }).then(function (response) {
+        })
+        .then(function (response) {
           let data = response.data;
           _this.$toast.success(data.error.message);
+        })
+        .catch(function (error) {
+          _this.$toast.fail('系统繁忙！');
+
         });
       }
     },

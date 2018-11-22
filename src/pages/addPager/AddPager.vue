@@ -1,31 +1,39 @@
 <template>
-  <div class="app-container device-bind">
-    <van-cell-group class="input-group">
+  <div class="app-container">
+
+    <van-cell-group class="input-group ">
       <van-field
         v-model="termCode"
         label="终端编号"
         disabled/>
 
       <van-field
-        v-model="deviceCode"
-        label="设备号"
-        placeholder="输入设备号"/>
+        v-model="surplusPager"
+        label="剩余纸张"
+        disabled/>
 
     </van-cell-group>
-    <van-button type="default" class="submit-btn" block :disabled="!(!!termCode && !!deviceCode)" @click="submitClick">绑定</van-button>
+
+    <van-button type="default"
+                class="submit-btn"
+                block
+                @click="submitClick">确认补纸
+    </van-button>
+
   </div>
 </template>
 
 <script>
   export default {
-    name: 'deviceBind',
+    name   : 'addPager',
     data () {
       return {
-        termCode: '',
-        deviceCode: ''
+        termCode    : '',
+        surplusPager: ''
       };
     },
     methods: {
+      // 提交确认按钮
       submitClick () {
         let _this = this;
 
@@ -35,25 +43,31 @@
           message    : '加载中...'
         });
 
-        _this.$axios.get('/wx/activeTerminal', {
+        _this.$axios.get('/http', {
           params: {
-            termCode  : _this.termCode,
-            deviceCode: _this.deviceCode
+            termCode: _this.termCode
           }
-        })
-        .then(function (response) {
-          let data = response.data;
-          _this.$toast.success(data.error.message);
+        }).then(function (response) {
 
-        })
-        .catch(function () {
+        }).catch(function (error) {
           _this.$toast.fail('系统繁忙！');
 
         });
       }
     },
-    created(){
+    created () {
+      let _this = this;
+
       this.termCode = globalTools.getUrlParam('termCode');
+
+      // 获取剩余纸张
+      _this.$axios.get('/http').then(function (response) {
+        let data = response.data;
+        _this.surplusPager = '';
+      }).catch(function (error) {
+        // _this.$toast.fail('出错了！');
+
+      });
     }
   };
 </script>

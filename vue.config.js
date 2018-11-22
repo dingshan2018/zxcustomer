@@ -1,79 +1,99 @@
 module.exports = {
   // 基本Url
-  baseUrl: process.env.NODE_ENV === 'production' ? '././' : '/',
+  baseUrl            : process.env.NODE_ENV === 'production' ? '././' : '/',
   // 打包路径
-  outputDir: 'consumer',
+  outputDir          : 'consumer',
   // 打包的时候将pages的注释解开
   // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>
-  /*pages: {
-    deviceBind: {
+  pages              : {
+    addPager     : {
       // page 的入口
-      entry: 'src/pages/deviceBind/main.js',
+      entry   : 'src/pages/addPager/main.js',
       // 模板来源
       template: 'public/index.html',
       // 在 dist/index.html 的输出
-      filename: 'deviceBind.html',
+      filename: 'addPager.html',
       // 当使用 title 选项时，
-      title: '终端绑定'
+      title   : '终端绑定'
     },
-    buyDevice: {
+    buyDevice    : {
       // page 的入口
-      entry: 'src/pages/buyDevice/main.js',
+      entry   : 'src/pages/buyDevice/main.js',
       // 模板来源
       template: 'public/index.html',
       // 在 dist/index.html 的输出
       filename: 'buyDevice.html',
       // 当使用 title 选项时，
-      title: '设备购买'
+      title   : '设备购买'
     },
-    testPaperOutput: {
+    deviceBind   : {
       // page 的入口
-      entry: 'src/pages/testPaperOutput/main.js',
+      entry   : 'src/pages/deviceBind/main.js',
       // 模板来源
       template: 'public/index.html',
       // 在 dist/index.html 的输出
-      filename: 'testPaperOutput.html',
+      filename: 'deviceBind.html',
       // 当使用 title 选项时，
-      title: '测试出纸'
+      title   : '终端绑定'
     },
+    /*outPaper     : {
+      // page 的入口
+      entry   : 'src/pages/outPaper/main.js',
+      // 模板来源
+      template: 'public/index.html',
+      // 在 dist/index.html 的输出
+      filename: 'outPaper.html',
+      // 当使用 title 选项时，
+      title   : '终端绑定'
+    },*/
     personnelBind: {
       // page 的入口
-      entry: 'src/pages/personnelBind/main.js',
+      entry   : 'src/pages/personnelBind/main.js',
       // 模板来源
       template: 'public/index.html',
       // 在 dist/index.html 的输出
       filename: 'personnelBind.html',
       // 当使用 title 选项时，
-      title: '人员绑定'
+      title   : '人员绑定'
     },
-    /!*paperOutput: {
+    replaceBoard : {
       // page 的入口
-      entry: 'src/pages/paperOutput/main.js',
+      entry   : 'src/pages/replaceBoard/main.js',
       // 模板来源
       template: 'public/index.html',
       // 在 dist/index.html 的输出
-      filename: 'paperOutput.html',
+      filename: 'replaceBoard.html',
       // 当使用 title 选项时，
-      title: '扫码出纸'
-    }*!/
-  },*/
+      title   : '人员绑定'
+    },
+    testOutPaper : {
+      // page 的入口
+      entry   : 'src/pages/testOutPaper/main.js',
+      // 模板来源
+      template: 'public/index.html',
+      // 在 dist/index.html 的输出
+      filename: 'testOutPaper.html',
+      // 当使用 title 选项时，
+      title   : '测试出纸'
+    }
+  },
   // 不打包Map
   productionSourceMap: false,
-  devServer: {
+  devServer          : {
     disableHostCheck: true,
-    port: 9090,
+    port            : 9090,
     // 跨域代理
-     proxy: {
+    proxy           : {
       '/wx': {
-        target: 'http://mp.bp.zcloudtechs.cn',
+        target      : 'http://mp.bp.zcloudtechs.cn',
         // target: 'http://192.168.10.123:8090',
-        ws: true,
+        ws          : true,
         changeOrigin: true
       }
     }
   },
   // webpack配置
-  chainWebpack: config => {
+  chainWebpack       : config => {
     // 使用cnpm可能会导致热更新失效，设置可恢复热更新
     config.resolve.symlinks(true);
     return config;

@@ -13,7 +13,7 @@
 
 <script>
   export default {
-    name   : 'paperOutput',
+    name   : 'OutPaper',
     data () {
       return {
         adSrc              : null,

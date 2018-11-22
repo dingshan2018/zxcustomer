@@ -13,7 +13,7 @@
 
 <script>
   export default {
-    name: 'deviceBind',
+    name   : 'deviceBind',
     data () {
       return {
         deviceCode: ''
@@ -26,11 +26,13 @@
         _this.$toast.loading({
           duration   : 0,
           forbidClick: true,
-          message    : '出纸中...'
+          message    : '加载中...'
         });
 
-        _this.$axios.post('/deviceBind', {
-          deviceCode: _this.deviceCode
+        _this.$axios.get('/deviceBind', {
+          params: {
+            deviceCode: _this.deviceCode
+          }
         }).then(function (response) {
 
         }).catch(function (error) {
@@ -40,7 +42,7 @@
         });
       }
     },
-    created(){
+    created () {
       this.deviceCode = 'boardCode0123456';
       // this.deviceCode = globalTools.getUrlParam('deviceCode');
     }
