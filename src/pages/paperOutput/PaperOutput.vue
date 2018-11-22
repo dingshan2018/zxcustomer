@@ -1,19 +1,5 @@
 <template>
   <div id="app" v-cloak>
-    <!-- 未关注 -->
-    <!--<div class="subscribe-wrapper" v-if="!subscribe">
-      <h1 class="subscribe-title">公司名称</h1>
-      <p class="subscribe-introduction">公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介公司简介</p>
-      &lt;!&ndash; 跳转到公众号关注 &ndash;&gt;
-      <a href="#">
-        <van-button type="default" class="subscribe-btn" block>关注公众号</van-button>
-      </a>
-      <p class="subscribe-warm-description">
-        哎呀！！亲您是第一次来<br/>
-        微信关注一次，即可免费使用
-      </p>
-    </div>-->
-    <!-- 已关注 -->
     <div class="ad-wrapper">
       <iframe class="ad-src" :src="adSrc" @load="adCountdownStart" frameborder="0" scrolling="no" seamless></iframe>
       <div class="ad-mask">
@@ -30,8 +16,6 @@
     name   : 'paperOutput',
     data () {
       return {
-        mounted            : false,
-        subscribe          : false,
         adSrc              : null,
         adLink             : null,
         adCountdown        : '',
@@ -40,12 +24,26 @@
       };
     },
     methods: {
+      // 获取广告信息
+      getAdInfo () {
+        let _this = this;
+
+        _this.$axios.get('/requestPath').then(function (response) {
+          let data = response.data;
+
+          _this.adSrc = 'https://cn.vuejs.org/index.html';
+          _this.adLink = 'https://cn.vuejs.org/index.html';
+          // this.adSrc = globalTools.getUrlParam('adSrc');
+          // this.adLink = globalTools.getUrlParam('adLink');
+        });
+      },
       // ad倒计时
       adCountdownStart () {
-        var _this = this;
+        let _this = this;
         _this.adCountdownShow = true;
         _this.adCountdown = (_this.adCountdownInterval + 's');
-        var interval = setInterval(function () {
+
+        let interval = setInterval(function () {
           if (_this.adCountdownInterval <= 0) {
             clearInterval(interval);
             _this.adCountdownShow = false;
@@ -56,7 +54,7 @@
       },
       // 出纸
       confirmBtnClick () {
-        var _this = this;
+        let _this = this;
 
         _this.$toast.loading({
           duration   : 0,
@@ -74,44 +72,7 @@
       }
     },
     created () {
-      let _this = this;
-
-      _this.adSrc = 'https://cn.vuejs.org/index.html';
-      _this.adLink = 'https://cn.vuejs.org/index.html';
-      // this.adSrc = globalTools.getUrlParam('adSrc');
-      // this.adLink = globalTools.getUrlParam('adLink');
-
-      // 后台获取用户数据
-      /*_this.$axios.get('/user').then(function (response) {
-        let data = response.data.user;
-        // 状态完成
-        _this.mounted = true;
-        // 用户关注状态
-        _this.subscribe = data.subscribe;
-        // 已关注获取url参数
-        if (data.subscribe) {
-          _this.adSrc = 'https://cn.vuejs.org/index.html';
-          _this.adLink = 'https://cn.vuejs.org/index.html';
-          // this.adSrc = globalTools.getUrlParam('adSrc');
-          // this.adLink = globalTools.getUrlParam('adLink');
-        }
-      }).catch(function (error) {
-        // 模拟回传数据
-        let data = {
-          subscribe: false
-        };
-        // 状态完成
-        _this.mounted = true;
-        // 用户关注状态
-        _this.subscribe = data.subscribe;
-        // 已关注获取url参数
-        if (data.subscribe) {
-          _this.adSrc = 'https://cn.vuejs.org/index.html';
-          _this.adLink = 'https://cn.vuejs.org/index.html';
-          // this.adSrc = globalTools.getUrlParam('adSrc');
-          // this.adLink = globalTools.getUrlParam('adLink');
-        }
-      });*/
+      this.getAdInfo();
     }
   };
 </script>

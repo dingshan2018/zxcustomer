@@ -2,17 +2,17 @@
   <div class="app-container device-bind">
     <van-cell-group class="input-group">
       <van-field
-        v-model="deviceCode"
-        label="设备编号"
+        v-model="termCode"
+        label="终端编号"
         disabled/>
 
       <van-field
-        v-model="boardCode"
-        label="钢板号"
-        placeholder="请输入钢板号"/>
+        v-model="deviceCode"
+        label="设备号"
+        placeholder="输入设备号"/>
 
     </van-cell-group>
-    <van-button type="default" class="submit-btn" block :disabled="!(!!boardCode && !!deviceCode)" @click="submitClick">绑定</van-button>
+    <van-button type="default" class="submit-btn" block :disabled="!(!!termCode && !!deviceCode)" @click="submitClick">绑定</van-button>
   </div>
 </template>
 
@@ -21,7 +21,7 @@
     name: 'deviceBind',
     data () {
       return {
-        boardCode: '',
+        termCode: '',
         deviceCode: ''
       };
     },
@@ -35,21 +35,20 @@
           message    : '绑定中...'
         });
 
-        _this.$axios.post('/deviceBind', {
-          boardCode: _this.boardCode,
-          deviceCode: _this.deviceCode
+        _this.$axios.get('/wx/activeTerminal', {
+          params: {
+            termCode  : _this.termCode,
+            deviceCode: _this.deviceCode
+          }
         }).then(function (response) {
+          let data = response.data;
+          _this.$toast.success(data.error.message);
 
-        }).catch(function (error) {
-          setTimeout(function () {
-            _this.$toast.success('绑定成功');
-          }, 3000);
         });
       }
     },
     created(){
-      this.deviceCode = 'boardCode0123456';
-      // this.deviceCode = globalTools.getUrlParam('deviceCode');
+      this.termCode = globalTools.getUrlParam('termCode');
     }
   };
 </script>

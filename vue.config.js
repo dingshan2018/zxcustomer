@@ -4,18 +4,8 @@ module.exports = {
   // 打包路径
   outputDir: 'consumer',
   // 打包的时候将pages的注释解开
-  pages: {
-    paperOutput: {
-      // page 的入口
-      entry: 'src/pages/paperOutput/main.js',
-      // 模板来源
-      template: 'public/index.html',
-      // 在 dist/index.html 的输出
-      filename: 'paperOutput.html',
-      // 当使用 title 选项时，
-      // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>
-      title: '扫码出纸'
-    },
+  // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>
+  /*pages: {
     deviceBind: {
       // page 的入口
       entry: 'src/pages/deviceBind/main.js',
@@ -45,22 +35,42 @@ module.exports = {
       filename: 'testPaperOutput.html',
       // 当使用 title 选项时，
       title: '测试出纸'
-    }
-  },
+    },
+    personnelBind: {
+      // page 的入口
+      entry: 'src/pages/personnelBind/main.js',
+      // 模板来源
+      template: 'public/index.html',
+      // 在 dist/index.html 的输出
+      filename: 'personnelBind.html',
+      // 当使用 title 选项时，
+      title: '人员绑定'
+    },
+    /!*paperOutput: {
+      // page 的入口
+      entry: 'src/pages/paperOutput/main.js',
+      // 模板来源
+      template: 'public/index.html',
+      // 在 dist/index.html 的输出
+      filename: 'paperOutput.html',
+      // 当使用 title 选项时，
+      title: '扫码出纸'
+    }*!/
+  },*/
   // 不打包Map
   productionSourceMap: false,
   devServer: {
     disableHostCheck: true,
     port: 9090,
     // 跨域代理
-    /* proxy: {
-      '/web-unified': {
-        // target: 'http://192.168.10.34:8080',
+     proxy: {
+      '/wx': {
+        target: 'http://mp.bp.zcloudtechs.cn',
         // target: 'http://192.168.10.123:8090',
         ws: true,
         changeOrigin: true
       }
-    } */
+    }
   },
   // webpack配置
   chainWebpack: config => {

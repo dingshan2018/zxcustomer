@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <title>扫码出纸</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no">
+  <meta name="format-detection" content="email=no">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <style>
+    #app {
+      overflow-y: auto;
+    }
+
+    .subscribe-wrapper {
+      padding: 10px;
+    }
+
+    .subscribe-title {
+      text-align: center;
+    }
+
+    .subscribe-introduction {
+      line-height: 1.5;
+      text-align: left;
+      text-indent: 28px;
+      font-size: 14px;
+    }
+
+    .subscribe-btn {
+      width: 280px;
+      margin: 30px auto;
+      border-radius: 4px;
+      font-size: 16px;
+      color: #fff;
+      background-color: #00c292;
+    }
+
+    .subscribe-warm-description {
+      line-height: 1.2;
+      text-align: center;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .ad-wrapper {
+      z-index: 10;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .ad-frame,
+    .ad-mask,
+    .ad-link {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .ad-mask {
+      z-index: 1;
+    }
+
+    .ad-countdown {
+      opacity: 0;
+      visibility: hidden;
+      z-index: 1;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 44px;
+      height: 44px;
+      line-height: 44px;
+      border: 1px solid #e0e0e0;
+      border-radius: 50%;
+      text-align: center;
+      font-size: 18px;
+      color: #fff;
+      background-color: rgba(0, 0, 0, 0.75);
+      transition: opacity 0.3s ease-out;
+    }
+
+    .ad-countdown--show {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.3s ease-in;
+    }
+
+    .confirm-btn {
+      z-index: 1;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      width: 100%;
+      height: 55px;
+      margin: 0;
+      border: none;
+      outline: none;
+      opacity: 0;
+      visibility: hidden;
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      background-color: #00c292;
+      transition: opacity 0.3s linear;
+    }
+
+    .confirm-btn--show {
+      opacity: 1;
+      visibility: visible;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app" v-cloak>
+    <div class="ad-wrapper">
+      <iframe class="ad-frame" id="adFrame" src="" frameborder="0" scrolling="no" seamless></iframe>
+      <div class="ad-mask">
+        <a class="ad-link" id="adLink" hidden></a>
+        <span class="ad-countdown" id="adCountDown"></span>
+        <button class="confirm-btn" id="confirmBtn">出纸</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+
+    var adFrame = document.getElementById('adFrame');
+    var adLink = document.getElementById('adLink');
+    var adCountDown = document.getElementById('adCountDown');
+    var confirmBtn = document.getElementById('confirmBtn');
+
+    // 获取广告信息
+    function getAdInfo () {
+      adFrame.src = getUrlParam('adSrc');
+      adLink.href = getUrlParam('adLink');
+      // adCountdownStart();
+    }
+
+    // ad倒计时
+    function adCountdownStart () {
+      var adCountdownInterval = 10;
+      addClass(adCountDown, 'ad-countdown--show');
+      adCountDown.innerText = adCountdownInterval + 's';
+
+      let interval = setInterval(function () {
+        if (adCountdownInterval <= 0) {
+          clearInterval(interval);
+          removeClass(adCountDown, 'ad-countdown--show');
+          addClass(confirmBtn, 'confirm-btn--show');
+        } else {
+          adCountDown.innerText = (--adCountdownInterval + 's');
+        }
+      }, 1000);
+    }
+
+    // 出纸
+    function confirmBtnClick () {
+      axios.get('/paperOutput').then(function (response) {
+        alert('出纸成功');
+
+      }).catch(function (error) {
+        alert('出纸失败');
+      });
+    }
+
+    function hasClass (elements, cName) {
+      return !!elements.className.match(new RegExp('(\\s|^)' + cName + '(\\s|$)'));
+    }
+
+    function addClass (elements, cName) {
+      if (!this.hasClass(elements, cName)) {
+        elements.className += ' ' + cName;
+      }
+    }
+
+    function removeClass (elements, cName) {
+      if (this.hasClass(elements, cName)) {
+        elements.className = elements.className.replace(new RegExp('(\\s|^)' + cName + '(\\s|$)'), '');
+      }
+    }
+
+    function getUrlParam (name) {
+      // 匹配目标参数
+      var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+      // 对querystring匹配目标参数
+      var result = window.location.search.substr(1).match(reg);
+      if (result != null) {
+        return decodeURIComponent(result[2]);
+      } else {
+        return null;
+      }
+    }
+
+    window.onload = function () {
+      adFrame.onload = adCountdownStart;
+      confirmBtn.onclick = confirmBtnClick;
+
+      getAdInfo();
+    };
+
+
+  </script>
+</body>
+
+</html>
