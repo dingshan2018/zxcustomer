@@ -152,7 +152,7 @@
     // 获取微信用户信息
     function getWxUserInfo () {
       //获取公众号用户信息
-      let accessCode = globalTools.getUrlParam('code');
+      let accessCode = getUrlParam('code');
 
       // 未授权
       if (!accessCode) {
@@ -169,35 +169,26 @@
         }).then(function (response) {
           let data = response.data;
 
-          if (data) {
-            userInfo = data.userInfo;
+          // 用户信息
+          if (data && data.role) {
 
-            // 用户已关注
-            if (userInfo && userInfo.subscribe) {
-              // 换板
-              if(userInfo.type === '0') {
-                location.href = '/replaceBoard.html';
+            // 维修
+            if (data.role.indexOf('SERVICEMAN')) {
+              location.href = '/deviceBind.html';
 
-              }
-              // 补纸
-              else if (userInfo.type === '1') {
-                location.href = '/addPager.html';
-
-              }
-              // 粉丝播放广告
-              else{
-                document.getElementById('app').style.display = 'block';
-                adFrame.onload = adCountdownStart;
-                confirmBtn.onclick = confirmBtnClick;
-
-                getAdInfo();
-              }
             }
-            // 未关注
-            else {
-              // location.href = "https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzAxNzcwODE2MA==&scene=110#wechat_redirect";
-              location.href = 'https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzUyOTM0OTc2NQ==&scene=126#wechat_redirect';
+            // 补纸
+            else if (data.role.indexOf('TISSUESMAN')) {
+              location.href = '/addPager.html';
 
+            }
+            // 粉丝播放广告
+            else {
+              document.getElementById('app').style.display = 'block';
+              adFrame.onload = adCountdownStart;
+              confirmBtn.onclick = confirmBtnClick;
+
+              getAdInfo();
             }
           } else {
             alert('获取用户信息失败');
@@ -212,7 +203,7 @@
     // 获取广告信息
     function getAdInfo () {
       adFrame.src = getUrlParam('adSrc');
-      adLink.href = getUrlParam('adLink');
+      // adLink.href = getUrlParam('adLink');
       // adCountdownStart();
     }
 
@@ -237,6 +228,7 @@
     function confirmBtnClick () {
       axios.get('/http').then(function (response) {
         alert('出纸成功');
+        WeixinJSBridge.call('closeWindow');
 
       }).catch(function (error) {
         alert('出纸失败');

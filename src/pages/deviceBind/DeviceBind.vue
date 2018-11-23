@@ -7,25 +7,120 @@
         disabled/>
 
       <van-field
+        v-model="type.name"
+        label="操作类型"
+        placeholder="选择操作类型"
+        @click.native="typeSheet = true"/>
+
+      <van-field
         v-model="deviceCode"
         label="设备号"
-        placeholder="输入设备号"/>
+        placeholder="填写设备号"
+        icon="more-o"
+        @click-icon="devicePopup = true"
+        required
+        clearable/>
 
     </van-cell-group>
-    <van-button type="default" class="submit-btn" block :disabled="!(!!termCode && !!deviceCode)" @click="submitClick">绑定</van-button>
+
+    <van-button type="default"
+                class="submit-btn"
+                block
+                :disabled="!(!!termCode && !!type.name && !!deviceCode)"
+                @click="submitClick">绑定
+    </van-button>
+
+    <!-- 上拉菜单 -->
+    <van-actionsheet
+      v-model="typeSheet"
+      :actions="typeActions"
+      cancel-text="取消"
+      @select="typeSelect"
+      @cancel="typeActionSheet = false"/>
+
+    <!-- 设备列表 -->
+    <van-popup v-model="devicePopup" position="bottom">
+      <van-picker :columns="deviceCodeList"
+                  value-key="code"
+                  show-toolbar
+                  title="选择设备"
+                  @cancel="devicePopup = false"
+                  @confirm="devicePickerConfirm"/>
+    </van-popup>
   </div>
 </template>
 
 <script>
   export default {
-    name: 'deviceBind',
+    name   : 'deviceBind',
     data () {
       return {
-        termCode: '',
-        deviceCode: ''
+        // 终端号
+        termCode      : '',
+        // 类型
+        type          : {
+          name: '换板',
+          id  : '01'
+        },
+        // 设备号
+        deviceCode    : '',
+        // 类型上拉菜单
+        typeSheet     : false,
+        // 类型上拉菜单的数据
+        typeActions   : [
+          {
+            name: '换板',
+            id  : '01'
+          },
+          {
+            name: '激活',
+            id  : '02'
+          }
+        ],
+        // 设备弹出层
+        devicePopup   : false,
+        // 设备选择器数据
+        deviceCodeList: [
+          {
+            code: '0121s5312s3d1'
+          },
+          {
+            code: '02sd5we4r1213'
+          }
+        ]
       };
     },
     methods: {
+      // 类型选择事件
+      typeSelect (item) {
+        let _this = this;
+
+        _this.type = item;
+        _this.typeSheet = false;
+
+        _this.getDeviceCodeList();
+      },
+      // 获取设备号列表
+      getDeviceCodeList () {
+        let _this = this;
+
+        _this.$axios.get('/http', {
+          params: {
+            type: _this.type.id
+          }
+        }).then(function (response) {
+          let data = response.data;
+          _this.deviceCodeList = data.deviceCodeList;
+        }).catch(function (error) {
+
+        });
+      },
+      // 设备选择确定
+      devicePickerConfirm (item, index) {
+        this.deviceCode = item.code;
+        this.devicePopup = false;
+      },
+      // 提交确认按钮
       submitClick () {
         let _this = this;
 
@@ -40,19 +135,21 @@
             termCode  : _this.termCode,
             deviceCode: _this.deviceCode
           }
-        })
-        .then(function (response) {
+        }).then(function (response) {
           let data = response.data;
           _this.$toast.success(data.error.message);
 
-        })
-        .catch(function () {
+          if (parseInt(data.code) === 0) {
+            setTimeout(WeixinJSBridge.call('closeWindow'), 3000);
+          }
+        }).catch(function () {
           _this.$toast.fail('系统繁忙！');
 
         });
       }
     },
-    created(){
+    created () {
+      this.getDeviceCodeList();
       this.termCode = globalTools.getUrlParam('termCode');
     }
   };

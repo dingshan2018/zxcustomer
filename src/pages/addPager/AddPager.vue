@@ -48,7 +48,12 @@
             termCode: _this.termCode
           }
         }).then(function (response) {
+          let data = response.data;
+          _this.$toast.success(data.error.message);
 
+          if (parseInt(data.code) === 0) {
+            setTimeout(WeixinJSBridge.call('closeWindow'), 3000);
+          }
         }).catch(function (error) {
           _this.$toast.fail('系统繁忙！');
 
@@ -64,6 +69,7 @@
       _this.$axios.get('/http').then(function (response) {
         let data = response.data;
         _this.surplusPager = '';
+
       }).catch(function (error) {
         // _this.$toast.fail('出错了！');
 

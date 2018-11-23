@@ -15,7 +15,7 @@
 
       <van-field
         v-model="device.name"
-        label="设备号"
+        label="设备"
         placeholder="选择设备"
         @click.native="devicePopup = true"/>
     </van-cell-group>
@@ -127,7 +127,12 @@
             deviceCode: _this.device.code
           }
         }).then(function (response) {
+          let data = response.data;
+          _this.$toast.success(data.error.message);
 
+          if (parseInt(data.code) === 0) {
+            setTimeout(WeixinJSBridge.call('closeWindow'), 3000);
+          }
         }).catch(function (error) {
           _this.$toast.fail('系统繁忙！');
 

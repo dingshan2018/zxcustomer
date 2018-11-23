@@ -34,11 +34,15 @@
             deviceCode: _this.deviceCode
           }
         }).then(function (response) {
+          let data = response.data;
+          _this.$toast.success(data.error.message);
 
+          if (parseInt(data.code) === 0) {
+            setTimeout(WeixinJSBridge.call('closeWindow'), 3000);
+          }
         }).catch(function (error) {
-          setTimeout(function () {
-            _this.$toast.success('出纸成功');
-          }, 3000);
+          _this.$toast.fail('系统繁忙！');
+
         });
       }
     },
