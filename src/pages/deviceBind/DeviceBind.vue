@@ -6,18 +6,18 @@
         label="终端编号"
         disabled/>
 
-      <van-field
+     <!--<van-field
         v-model="type.name"
         label="操作类型"
         placeholder="选择操作类型"
-        @click.native="typeSheet = true"/>
+        @click.native="typeSheet = true"/>-->
 
+      <!-- icon="more-o"
+        @click-icon="devicePopup = true" -->
       <van-field
         v-model="deviceCode"
         label="设备号"
         placeholder="填写设备号"
-        icon="more-o"
-        @click-icon="devicePopup = true"
         required
         clearable/>
 
@@ -26,7 +26,7 @@
     <van-button type="default"
                 class="submit-btn"
                 block
-                :disabled="!(!!termCode && !!type.name && !!deviceCode)"
+                :disabled="!(!!termCode && !!deviceCode)"
                 @click="submitClick">绑定
     </van-button>
 
@@ -80,14 +80,7 @@
         // 设备弹出层
         devicePopup   : false,
         // 设备选择器数据
-        deviceCodeList: [
-          {
-            code: '0121s5312s3d1'
-          },
-          {
-            code: '02sd5we4r1213'
-          }
-        ]
+        deviceCodeList: []
       };
     },
     methods: {

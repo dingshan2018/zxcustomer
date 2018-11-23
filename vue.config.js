@@ -5,7 +5,7 @@ module.exports = {
   outputDir          : 'consumer',
   // 打包的时候将pages的注释解开
   // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>
-  /*pages              : {
+  pages              : {
     addPager     : {
       // page 的入口
       entry   : 'src/pages/addPager/main.js',
@@ -36,7 +36,7 @@ module.exports = {
       // 当使用 title 选项时，
       title   : '终端绑定'
     },
-    /!*outPaper     : {
+    /*outPaper     : {
       // page 的入口
       entry   : 'src/pages/outPaper/main.js',
       // 模板来源
@@ -45,7 +45,7 @@ module.exports = {
       filename: 'outPaper.html',
       // 当使用 title 选项时，
       title   : '终端绑定'
-    },*!/
+    },*/
     personnelBind: {
       // page 的入口
       entry   : 'src/pages/personnelBind/main.js',
@@ -56,7 +56,7 @@ module.exports = {
       // 当使用 title 选项时，
       title   : '人员绑定'
     },
-    /!*replaceBoard : {
+    /*replaceBoard : {
       // page 的入口
       entry   : 'src/pages/replaceBoard/main.js',
       // 模板来源
@@ -65,7 +65,7 @@ module.exports = {
       filename: 'replaceBoard.html',
       // 当使用 title 选项时，
       title   : '人员绑定'
-    },*!/
+    },*/
     testOutPaper : {
       // page 的入口
       entry   : 'src/pages/testOutPaper/main.js',
@@ -76,7 +76,7 @@ module.exports = {
       // 当使用 title 选项时，
       title   : '测试出纸'
     }
-  },*/
+  },
   // 不打包Map
   productionSourceMap: false,
   devServer          : {

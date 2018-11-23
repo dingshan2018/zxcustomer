@@ -144,24 +144,24 @@
   <script>
 
     var userInfo = undefined;
-    var adFrame = document.getElementById('adFrame');
-    var adLink = document.getElementById('adLink');
-    var adCountDown = document.getElementById('adCountDown');
-    var confirmBtn = document.getElementById('confirmBtn');
+    var adFrame = document.getElementById("adFrame");
+    var adLink = document.getElementById("adLink");
+    var adCountDown = document.getElementById("adCountDown");
+    var confirmBtn = document.getElementById("confirmBtn");
 
     // 获取微信用户信息
     function getWxUserInfo () {
       //获取公众号用户信息
-      let accessCode = getUrlParam('code');
+      let accessCode = getUrlParam("code");
 
       // 未授权
       if (!accessCode) {
         //获取授权code的回调地址，获取到code，直接返回到当前页
-        location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx4e2cf38426225453&redirect_uri=' +
-          encodeURIComponent(location.href) + '&response_type=code&scope=snsapi_userinfo&state=0#wechat_redirect';
+        location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx4e2cf38426225453&redirect_uri=" +
+          encodeURIComponent(location.href) + "&response_type=code&scope=snsapi_userinfo&state=0#wechat_redirect";
       }
       else {
-        axios.get('/wx/userInfo', {
+        axios.get("/wx/userInfo", {
           params: {
             code : accessCode,
             state: 0
@@ -173,28 +173,28 @@
           if (data && data.role) {
 
             // 维修
-            if (data.role.indexOf('SERVICEMAN')) {
-              location.href = '/deviceBind.html';
+            if (data.role.indexOf("SERVICEMAN")) {
+              location.href = "/deviceBind.html";
 
             }
             // 补纸
-            else if (data.role.indexOf('TISSUESMAN')) {
-              location.href = '/addPager.html';
+            else if (data.role.indexOf("TISSUESMAN")) {
+              location.href = "/addPager.html";
 
             }
             // 粉丝播放广告
             else {
-              document.getElementById('app').style.display = 'block';
+              document.getElementById("app").style.display = "block";
               adFrame.onload = adCountdownStart;
               confirmBtn.onclick = confirmBtnClick;
 
               getAdInfo();
             }
           } else {
-            alert('获取用户信息失败');
+            // alert('获取用户信息失败');
           }
         }).catch(function (error) {
-          alert('获取用户信息失败:' + JSON.stringify(error));
+          // alert('获取用户信息失败:' + JSON.stringify(error));
 
         });
       }
@@ -202,7 +202,7 @@
 
     // 获取广告信息
     function getAdInfo () {
-      adFrame.src = getUrlParam('adSrc');
+      adFrame.src = getUrlParam("adSrc");
       // adLink.href = getUrlParam('adLink');
       // adCountdownStart();
     }
@@ -210,50 +210,56 @@
     // ad倒计时
     function adCountdownStart () {
       var adCountdownInterval = 10;
-      addClass(adCountDown, 'ad-countdown--show');
-      adCountDown.innerText = adCountdownInterval + 's';
+      addClass(adCountDown, "ad-countdown--show");
+      adCountDown.innerText = adCountdownInterval + "s";
 
       let interval = setInterval(function () {
         if (adCountdownInterval <= 0) {
           clearInterval(interval);
-          removeClass(adCountDown, 'ad-countdown--show');
-          addClass(confirmBtn, 'confirm-btn--show');
+          removeClass(adCountDown, "ad-countdown--show");
+          addClass(confirmBtn, "confirm-btn--show");
         } else {
-          adCountDown.innerText = (--adCountdownInterval + 's');
+          adCountDown.innerText = (--adCountdownInterval + "s");
         }
       }, 1000);
     }
 
     // 出纸
     function confirmBtnClick () {
-      axios.get('/http').then(function (response) {
-        alert('出纸成功');
-        WeixinJSBridge.call('closeWindow');
+      axios.get("/wx/saveTissueRecord", {
+        params: {
+          termCode : getUrlParam("termCode"),
+          wxUserId: userInfo.userId,
+          offerKey: getUrlParam("offerKey")
+        }
+      }).then(function (response) {
+        alert("出纸成功");
+        WeixinJSBridge.call("closeWindow");
 
       }).catch(function (error) {
-        alert('出纸失败');
+        alert("出纸失败");
       });
     }
 
     function hasClass (elements, cName) {
-      return !!elements.className.match(new RegExp('(\\s|^)' + cName + '(\\s|$)'));
+      return !!elements.className.match(new RegExp("(\\s|^)" + cName + "(\\s|$)"));
     }
 
     function addClass (elements, cName) {
       if (!this.hasClass(elements, cName)) {
-        elements.className += ' ' + cName;
+        elements.className += " " + cName;
       }
     }
 
     function removeClass (elements, cName) {
       if (this.hasClass(elements, cName)) {
-        elements.className = elements.className.replace(new RegExp('(\\s|^)' + cName + '(\\s|$)'), '');
+        elements.className = elements.className.replace(new RegExp("(\\s|^)" + cName + "(\\s|$)"), "");
       }
     }
 
     function getUrlParam (name) {
       // 匹配目标参数
-      var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+      var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
       // 对querystring匹配目标参数
       var result = window.location.search.substr(1).match(reg);
       if (result != null) {
