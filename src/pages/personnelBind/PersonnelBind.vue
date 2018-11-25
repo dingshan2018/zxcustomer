@@ -80,7 +80,9 @@
           _this.$toast.success(data.error.message);
 
           if (parseInt(data.code) === 0) {
-            setTimeout(WeixinJSBridge.call('closeWindow'), 3000);
+            setTimeout(function () {
+              WeixinJSBridge.call("closeWindow");
+            }, 3000);
           }
         })
         .catch(function (error) {

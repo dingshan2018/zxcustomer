@@ -14,7 +14,7 @@ module.exports = {
       // 在 dist/index.html 的输出
       filename: 'addPager.html',
       // 当使用 title 选项时，
-      title   : '终端绑定'
+      title   : '补纸'
     },
     buyDevice    : {
       // page 的入口
