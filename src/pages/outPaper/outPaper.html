@@ -11,6 +11,10 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <!--<script src="https://res.wx.qq.com/mmbizwap/zh_CN/htmledition/js/vconsole/3.0.0/vconsole.min.js"></script>
+  <script>
+    new VConsole();
+  </script>-->
   <style>
     #app {
       overflow-y: auto;
@@ -153,7 +157,7 @@
     function getWxUserInfo () {
       //获取公众号用户信息
       let accessCode = getUrlParam("code");
-
+      // alert("accessCode>>" + !accessCode);
       // 未授权
       if (!accessCode) {
         //获取授权code的回调地址，获取到code，直接返回到当前页
@@ -163,40 +167,49 @@
       else {
         axios.get("/wx/userInfo", {
           params: {
-            code : accessCode,
+            code: accessCode,
             state: 0
           }
         }).then(function (response) {
-          let data = response.data;
-          userInfo = data.userInfo;
-          // alert(JSON.stringify(data));
+          try {
+            let data = response.data;
+            userInfo = data.userInfo;
 
-          // 用户信息
-          if (data && data.role) {
-            // 维修
-            if (data.role.indexOf("SERVICEMAN") >= 0) {
-              // alert("维修");
-              location.href = "/deviceBind.html?termCode=" + getUrlParam("termCode") + "&userId=" + userInfo.userId;
-            }
-            // 补纸
-            else if (data.role.indexOf("TISSUESMAN") >= 0) {
-              // alert("补纸");
-              location.href = "/addPager.html?termCode=" + getUrlParam("termCode") + "&userId=" + userInfo.userId;
-            }
-          }
-          // 粉丝播放广告
-          else if (data && data.userInfo) {
-            // alert("粉丝播广告");
+            // alert("userInfo>>" + JSON.stringify(data));
 
+            // 未关注
+            if (!userInfo.subscribe) {
+              return location.href = "https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzUyOTM0OTc2NQ==&scene=126#wechat_redirect";
+            }
+            // 已关注，角色判断
+            else if (data.role) {
+              // 维修
+              if (data.role.indexOf("SERVICEMAN") >= 0) {
+                // alert("维修");
+                return location.href = "/deviceBind.html?termCode=" + getUrlParam("termCode") + "&userId=" +
+                  userInfo.userId;
+              }
+              // 补纸
+              else if (data.role.indexOf("TISSUESMAN") >= 0) {
+                // alert("补纸");
+                return location.href = "/addPager.html?termCode=" + getUrlParam("termCode") + "&userId=" +
+                  userInfo.userId;
+              }
+            }
+
+            // alert("播广告");
+
+            // 否则播放广告
             document.getElementById("app").style.display = "block";
             adFrame.onload = adCountdownStart;
             confirmBtn.onclick = confirmBtnClick;
 
             getAdInfo();
+
+          } catch (e) {
+            // alert("出错了>>" + e);
           }
-          else {
-            // alert("获取用户信息data为空" + JSON.stringify(data));
-          }
+
         }).catch(function (error) {
           // alert("获取用户信息失败:" + JSON.stringify(error));
 
@@ -207,6 +220,7 @@
     // 获取广告信息
     function getAdInfo () {
       adFrame.src = getUrlParam("adSrc");
+      // alert("adSrc>>" + adFrame.src);
       // adLink.href = getUrlParam('adLink');
     }
 
