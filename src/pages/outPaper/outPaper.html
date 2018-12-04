@@ -226,7 +226,7 @@
 
     // ad倒计时
     function adCountdownStart () {
-      var adCountdownInterval = 10;
+      var adCountdownInterval = 3;
       addClass(adCountDown, "ad-countdown--show");
       adCountDown.innerText = adCountdownInterval + "s";
 
@@ -234,7 +234,9 @@
         if (adCountdownInterval <= 0) {
           clearInterval(interval);
           removeClass(adCountDown, "ad-countdown--show");
-          addClass(confirmBtn, "confirm-btn--show");
+          // addClass(confirmBtn, "confirm-btn--show");
+          // 直接调用出纸
+          confirmBtnClick();
         } else {
           adCountDown.innerText = (--adCountdownInterval + "s");
         }
@@ -287,7 +289,6 @@
       getWxUserInfo();
 
     };
-
 
   </script>
 </body>
