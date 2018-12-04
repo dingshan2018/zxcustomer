@@ -20,6 +20,7 @@ import {
   Popup,
   NumberKeyboard,
   Icon,
+  Dialog,
   Loading,
   Toast
 } from 'vant';
@@ -52,6 +53,7 @@ Vue.use(Row).
   use(Popup).
   use(NumberKeyboard).
   use(Icon).
+  use(Dialog).
   use(Loading).
   use(Toast);
 

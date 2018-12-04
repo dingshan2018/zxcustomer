@@ -143,43 +143,43 @@
 
 <script>
   export default {
-    name    : 'deviceDetails',
+    name: "deviceDetails",
     data () {
       return {
         // BScrollEx实例
         mainBScrollInstance: null,
         // 设备数据
-        goodsData          : {
+        goodsData: {
           // id
-          deviceId : '',
+          deviceId: "",
           // 轮播
-          imgs     : [],
+          imgs: [],
           // 标签
-          tag      : '',
+          tag: "",
           // 名称
-          name     : '',
+          name: "",
           // 价格
-          price    : '',
+          price: "",
           // 参考价
-          reference: '',
+          reference: "",
           // 剩余数
-          surplus  : '',
+          surplus: "",
           // 介绍
-          introduce: '',
+          introduce: "",
           // 参数
-          parameter: ''
+          parameter: ""
         },
         // 详情tab
-        tabActive          : 0,
+        tabActive: 0,
         // 购买数量
-        buyQuantity        : '1',
+        buyQuantity: "1",
         // popup购买数量显示
-        popupGoodsSummary  : false,
+        popupGoodsSummary: false,
         // 数字键盘显示
-        keyboard           : false,
+        keyboard: false,
         // 微信支付参数
-        userInfo           : {},
-        payData            : {}
+        userInfo: {},
+        payData: {}
       };
     },
     computed: {
@@ -190,68 +190,65 @@
         return parseFloat(this.buyQuantity) * price;
       }
     },
-    methods : {
+    methods: {
       // 微信用户信息
       getWxUserInfo () {
         let _this = this;
         //获取公众号用户信息
-        let accessCode = globalTools.getUrlParam('code');
+        let accessCode = globalTools.getUrlParam("code");
 
         if (accessCode == null) {
           //获取授权code的回调地址，获取到code，直接返回到当前页
           let fromurl = location.href;
-          let url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx4e2cf38426225453&redirect_uri=' +
-            encodeURIComponent(fromurl) + '&response_type=code&scope=snsapi_userinfo&state=0#wechat_redirect';
+          let url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx4e2cf38426225453&redirect_uri=" +
+            encodeURIComponent(fromurl) + "&response_type=code&scope=snsapi_userinfo&state=0#wechat_redirect";
 
           location.href = url;
         }
         else {
           // alert('accesscode:' + accessCode);
-          _this.$axios.get('/wx/userInfo', {
+          _this.$axios.get("/wx/userInfo", {
             params: {
-              code : accessCode,
+              code: accessCode,
               state: 0
             }
           }).then(function (response) {
             // alert('获取用户信息成功:' + JSON.stringify(response.data));
             let data = response.data;
 
-            if (data != null) {
-              _this.userInfo = data.userInfo;
+            if (!data && !data.userInfo) return _this.$dialog.alert({
+              message: "获取用户信息失败"
+            });
 
-              if (_this.userInfo != null && _this.userInfo.subscribe) {
-                // alert("用户已经关注");
-                // alert("播放广告url: "+_this.adSrc+"终端编号："+_this.termCode);
-                // _this.adCountdownStart();
-                // _this.wxpay();
-              } else {
-                // alert("用户未关注");
-                // location.href = "https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzAxNzcwODE2MA==&scene=110#wechat_redirect";
-                location.href = 'https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzUyOTM0OTc2NQ==&scene=126#wechat_redirect';
+            // 用户未关注
+            if (!data.userInfo.subscribe) {
+              // location.href = "https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzAxNzcwODE2MA==&scene=110#wechat_redirect";
+              location.href = "https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzUyOTM0OTc2NQ==&scene=126#wechat_redirect";
+            }
 
-              }
-            } else {
-              alert('获取用户信息失败');
+            if (!data.userInfo.userId) {
+              _this.$dialog.alert({
+                message: "为保障权益，建议您先注册成为加盟商。"
+              });
             }
           }).catch(function (error) {
-            alert('获取用户信息失败:' + JSON.stringify(error));
+            // alert("获取用户信息失败:" + JSON.stringify(error));
 
           });
         }
-        // console.log("access_code:"+accessCode);
       },
       // 预支付
       wxpay () {
         // $.showLoading("正在加载...");
         let _this = this;
-        let total_fee = '1';
+        let total_fee = "1";
 
-        _this.$axios.get('/wx/wxpay/dingshanPay', {
+        _this.$axios.get("/wx/wxpay/dingshanPay", {
           params: {
             total_fee: total_fee,
-            open_id  : _this.userInfo.openId,
-            equ_type : '00',
-            count    : _this.buyQuantity
+            open_id: _this.userInfo.openId,
+            equ_type: "00",
+            count: _this.buyQuantity
           }
         }).then(function (res) {
           let data = res.data;
@@ -259,13 +256,13 @@
           if (parseInt(data.code) === 0) {
             _this.payData = data.data;
 
-            if (typeof WeixinJSBridge === 'undefined') {
+            if (typeof WeixinJSBridge === "undefined") {
               if (document.addEventListener) {
-                document.addEventListener('WeixinJSBridgeReady', _this.onBridgeReady(_this.payData), false);
+                document.addEventListener("WeixinJSBridgeReady", _this.onBridgeReady(_this.payData), false);
               }
               else if (document.attachEvent) {
-                document.attachEvent('WeixinJSBridgeReady', _this.onBridgeReady(_this.payData));
-                document.attachEvent('onWeixinJSBridgeReady', _this.onBridgeReady(_this.payData));
+                document.attachEvent("WeixinJSBridgeReady", _this.onBridgeReady(_this.payData));
+                document.attachEvent("onWeixinJSBridgeReady", _this.onBridgeReady(_this.payData));
               }
             }
             else {
@@ -288,21 +285,21 @@
 
         let data = JSON.parse(json);
 
-        WeixinJSBridge.invoke('getBrandWCPayRequest', {
-          'appId'    : data.appId,
-          'nonceStr' : data.nonceStr,
-          'package'  : data.package,
-          'paySign'  : data.paySign,
-          'signType' : data.signType,
-          'timeStamp': data.timeStamp
+        WeixinJSBridge.invoke("getBrandWCPayRequest", {
+          "appId": data.appId,
+          "nonceStr": data.nonceStr,
+          "package": data.package,
+          "paySign": data.paySign,
+          "signType": data.signType,
+          "timeStamp": data.timeStamp
         }, function (res) {
           // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。
-          if (res.err_msg === 'get_brand_wcpay_request:ok') {
-            alert('支付成功');
+          if (res.err_msg === "get_brand_wcpay_request:ok") {
+            alert("支付成功");
             _this.popupGoodsSummary = false;
           }
           else {
-            alert('支付失败' + JSON.stringify(res));
+            alert("支付失败" + JSON.stringify(res));
           }
         });
       },
@@ -315,7 +312,7 @@
       countLess () {
         let quantity = parseInt(this.buyQuantity) - 1;
 
-        this.buyQuantity = quantity > 0 ? quantity.toString() : '1';
+        this.buyQuantity = quantity > 0 ? quantity.toString() : "1";
       },
       // 购买数量加
       countPlus () {
@@ -335,16 +332,16 @@
       keyboardDelete () {
         this.buyQuantity = this.buyQuantity.slice(0, this.buyQuantity.length - 1);
         if (this.buyQuantity.length <= 0) {
-          this.buyQuantity = '1';
+          this.buyQuantity = "1";
         }
       },
       // 数字键盘关闭
       keyboardClose () {
         let _this = this;
-        _this.$refs.popupGoodsSummary.$el.style.bottom = '50px';
-        _this.$refs.popupGoodsSummary.$el.style.transitionDuration = '0.15s';
+        _this.$refs.popupGoodsSummary.$el.style.bottom = "50px";
+        _this.$refs.popupGoodsSummary.$el.style.transitionDuration = "0.15s";
         setTimeout(function () {
-          _this.$refs.popupGoodsSummary.$el.style.transitionDuration = '0.3s';
+          _this.$refs.popupGoodsSummary.$el.style.transitionDuration = "0.3s";
         }, 150);
       },
       // 购买数量函数
@@ -357,8 +354,8 @@
         _this.keyboard = true;
 
         setTimeout(function () {
-          _this.$refs.popupGoodsSummary.$el.style.bottom = '246px';
-          _this.$refs.popupGoodsSummary.$el.style.transitionDuration = '0.3s';
+          _this.$refs.popupGoodsSummary.$el.style.bottom = "246px";
+          _this.$refs.popupGoodsSummary.$el.style.transitionDuration = "0.3s";
         }, 200);
       },
       // 购买
@@ -366,19 +363,19 @@
         let _this = this;
 
         _this.$toast.loading({
-          duration   : 0,
+          duration: 0,
           forbidClick: true,
-          message    : '购买中...'
+          message: "购买中..."
         });
 
-        _this.$axios.post('/buyDevice', {
+        _this.$axios.post("/buyDevice", {
           deviceId: _this.$route.params.deviceId,
           quantity: _this.buyQuantity
         }).then(function (response) {
 
         }).catch(function (error) {
           setTimeout(function () {
-            _this.$toast.success('购买成功');
+            _this.$toast.success("购买成功");
           }, 3000);
         });
       },
@@ -386,23 +383,24 @@
       getGoodsData () {
         let _this = this;
 
-        _this.$axios.post('/deviceData', {
+        _this.$axios.post("/deviceData", {
           // deviceId: _this.$route.params.deviceId
         }).then(function (response) {
 
         }).catch(function (error) {
           _this.goodsData = {
-            deviceId : _this.$route.params.deviceId,
-            imgs     : [
-              'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541337717739&di=3b832a9ab3df64f36c0c92d6521bbdbd&imgtype=0&src=http%3A%2F%2Fh.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2Fb999a9014c086e064a76b12f0f087bf40bd1cbfc.jpg',
-              'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541337717739&di=3b832a9ab3df64f36c0c92d6521bbdbd&imgtype=0&src=http%3A%2F%2Fh.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2Fb999a9014c086e064a76b12f0f087bf40bd1cbfc.jpg'],
-            tag      : '服务商',
-            name     : '船舰',
-            price    : '0.01',
-            reference: '0.1',
-            surplus  : '106',
-            introduce: '商品介绍',
-            parameter: '产品参数'
+            deviceId: _this.$route.params.deviceId,
+            imgs: [
+              "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541337717739&di=3b832a9ab3df64f36c0c92d6521bbdbd&imgtype=0&src=http%3A%2F%2Fh.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2Fb999a9014c086e064a76b12f0f087bf40bd1cbfc.jpg",
+              "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541337717739&di=3b832a9ab3df64f36c0c92d6521bbdbd&imgtype=0&src=http%3A%2F%2Fh.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2Fb999a9014c086e064a76b12f0f087bf40bd1cbfc.jpg"
+            ],
+            tag: "服务商",
+            name: "船舰",
+            price: "0.01",
+            reference: "0.1",
+            surplus: "106",
+            introduce: "商品介绍",
+            parameter: "产品参数"
           };
         });
       }
@@ -421,17 +419,18 @@
 
       // 获取设备详情
       _this.goodsData = {
-        deviceId : _this.$route.params.deviceId,
-        imgs     : [
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541337717739&di=3b832a9ab3df64f36c0c92d6521bbdbd&imgtype=0&src=http%3A%2F%2Fh.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2Fb999a9014c086e064a76b12f0f087bf40bd1cbfc.jpg',
-          'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541337717739&di=3b832a9ab3df64f36c0c92d6521bbdbd&imgtype=0&src=http%3A%2F%2Fh.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2Fb999a9014c086e064a76b12f0f087bf40bd1cbfc.jpg'],
-        tag      : '服务商',
-        name     : '船舰',
-        price    : '0.01',
-        reference: '0.1',
-        surplus  : '106',
-        introduce: '商品介绍',
-        parameter: '产品参数'
+        deviceId: _this.$route.params.deviceId,
+        imgs: [
+          "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541337717739&di=3b832a9ab3df64f36c0c92d6521bbdbd&imgtype=0&src=http%3A%2F%2Fh.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2Fb999a9014c086e064a76b12f0f087bf40bd1cbfc.jpg",
+          "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541337717739&di=3b832a9ab3df64f36c0c92d6521bbdbd&imgtype=0&src=http%3A%2F%2Fh.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2Fb999a9014c086e064a76b12f0f087bf40bd1cbfc.jpg"
+        ],
+        tag: "服务商",
+        name: "船舰",
+        price: "0.01",
+        reference: "0.1",
+        surplus: "106",
+        introduce: "商品介绍",
+        parameter: "产品参数"
       };
 
       // _this.getGoodsData();
@@ -477,7 +476,7 @@
     color: #888;
   }
 
-  .goods-desc-title:after{
+  .goods-desc-title:after {
     top: -50%;
     left: -50%;
     right: -50%;
