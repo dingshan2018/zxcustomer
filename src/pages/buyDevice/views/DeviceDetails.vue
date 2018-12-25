@@ -73,29 +73,23 @@
           </div>
         </div>
 
-        <!--<van-tabs v-model="tabActive" class="goods-cell">
-          <van-tab title="商品介绍" class="goods-desc-content">123</van-tab>
-          <van-tab title="产品参数" class="goods-desc-content">
-            {{goodsData.parameter}}
-          </van-tab>
-        </van-tabs>-->
       </div>
     </div>
 
     <div class="app-footer van-hairline--top" @touchmove.stop.prevent>
       <van-submit-bar
         :price="buyTotalMoney"
+        :disabled="!userInfo.openId"
         button-text="购买"
-        @submit="wxpay"
-      />
+        @submit="wxpay"/>
     </div>
 
+    <!-- 商品规格 -->
     <van-popup
       class="popup__goods-summary van-hairline--bottom"
       v-model="popupGoodsSummary"
       position="bottom"
       :lazy-render="false"
-      @click-overlay="popupOverlayClick"
       ref="popupGoodsSummary">
       <van-card
         class="goods-summary van-hairline--bottom">
@@ -111,33 +105,18 @@
         </p>
       </van-card>
 
-      <van-cell>
-        <div slot="title" style="line-height: 34px;">数量</div>
-        <div class="number-count van-hairline--surround">
-          <button class="number-count__less van-hairline--left" @click="countLess"></button>
-          <input class="number-count__quantity"
-                 type="number"
-                 maxlength="3"
-                 v-model="buyQuantity"
-                 @click.stop.prevent="buyQuantityClick">
-          <button class="number-count__plus van-hairline--right" @click="countPlus"></button>
-        </div>
+      <van-cell title="数量" class="buy-quantity">
+        <van-stepper
+          v-model="buyQuantity"
+          integer
+          :min="1"
+          :max="goodsData.surplus"
+          :step="1"
+          disable-input/>
       </van-cell>
+      <van-cell>&nbsp;</van-cell>
 
     </van-popup>
-
-    <van-number-keyboard
-      :show="keyboard"
-      :z-index="2003"
-      extra-key=""
-      close-button-text="完成"
-      :hide-on-click-outside="false"
-      @blur="keyboard = false"
-      @input="keyboardInput"
-      @delete="keyboardDelete"
-      @close="keyboardClose"
-      ref="keyboard"/>
-
   </div>
 </template>
 
@@ -177,8 +156,9 @@
         popupGoodsSummary: false,
         // 数字键盘显示
         keyboard: false,
-        // 微信支付参数
+        // 用户信息
         userInfo: {},
+        // 微信支付参数
         payData: {}
       };
     },
@@ -196,7 +176,7 @@
         let _this = this;
         //获取公众号用户信息
         let accessCode = globalTools.getUrlParam("code");
-
+        // alert("accessCode_____" + accessCode);
         if (accessCode == null) {
           //获取授权code的回调地址，获取到code，直接返回到当前页
           let fromurl = location.href;
@@ -206,20 +186,24 @@
           location.href = url;
         }
         else {
-          // alert('accesscode:' + accessCode);
+          // alert("请求/wx/userInfo_____");
           _this.$axios.get("/wx/userInfo", {
             params: {
               code: accessCode,
               state: 0
             }
           }).then(function (response) {
-            // alert('获取用户信息成功:' + JSON.stringify(response.data));
+            // alert("获取用户信息成功:" + JSON.stringify(response.data));
             let data = response.data;
 
             if (!data && !data.userInfo) return _this.$dialog.alert({
               message: "获取用户信息失败"
             });
 
+            // 用户数据
+            _this.userInfo = data.userInfo;
+
+            // alert("用户是否关注_____" + data.userInfo.subscribe);
             // 用户未关注
             if (!data.userInfo.subscribe) {
               // location.href = "https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzAxNzcwODE2MA==&scene=110#wechat_redirect";
@@ -232,17 +216,19 @@
               });
             }
           }).catch(function (error) {
-            // alert("获取用户信息失败:" + JSON.stringify(error));
-
+            _this.$dialog.alert({
+              title: "系统发生错误",
+              message: error
+            });
           });
         }
       },
-      // 预支付
+      // 请求后台预支付
       wxpay () {
         // $.showLoading("正在加载...");
         let _this = this;
         let total_fee = "1";
-
+        // alert("支付wxpay_____"+_this.userInfo);
         _this.$axios.get("/wx/wxpay/dingshanPay", {
           params: {
             total_fee: total_fee,
@@ -252,7 +238,7 @@
           }
         }).then(function (res) {
           let data = res.data;
-
+          // alert("支付请求回调_____" + data);
           if (parseInt(data.code) === 0) {
             _this.payData = data.data;
 
@@ -270,17 +256,21 @@
             }
           }
           else {
-            alert(res.message);
+            _this.$dialog.alert({
+              message: res.message
+            });
           }
         }).catch(function (error) {
+          _this.$dialog.alert({
+            title: "系统发生错误",
+            message: error
+          });
 
         });
       },
-
+      // 调用微信支付
       onBridgeReady (json) {
-        /* alert("padata:"+JSON.stringify(json));
-         alert(typeof json);
-         alert("appid"+json.appId);*/
+        // alert("onBridgeReady:" + JSON.stringify(json));
         let _this = this;
 
         let data = JSON.parse(json);
@@ -295,54 +285,17 @@
         }, function (res) {
           // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。
           if (res.err_msg === "get_brand_wcpay_request:ok") {
-            alert("支付成功");
+            _this.$dialog.alert({
+              message: "支付成功"
+            });
             _this.popupGoodsSummary = false;
           }
           else {
-            alert("支付失败" + JSON.stringify(res));
+            _this.$dialog.alert({
+              message: "支付失败" + JSON.stringify(res)
+            });
           }
         });
-      },
-      // popup蒙层关闭
-      popupOverlayClick () {
-        this.keyboard = false;
-        this.keyboardClose();
-      },
-      // 购买数量减
-      countLess () {
-        let quantity = parseInt(this.buyQuantity) - 1;
-
-        this.buyQuantity = quantity > 0 ? quantity.toString() : "1";
-      },
-      // 购买数量加
-      countPlus () {
-        let quantity = parseInt(this.buyQuantity) + 1;
-
-        this.buyQuantity = quantity > parseInt(this.goodsData.surplus) ? this.buyQuantity : quantity.toString();
-      },
-      // 数字键盘输入
-      keyboardInput (value) {
-        this.buyQuantity += value > 0 ? value : 1;
-
-        if (parseInt(this.buyQuantity) > parseInt(this.goodsData.surplus)) {
-          this.buyQuantity = this.goodsData.surplus.toString();
-        }
-      },
-      // 数字键盘删除
-      keyboardDelete () {
-        this.buyQuantity = this.buyQuantity.slice(0, this.buyQuantity.length - 1);
-        if (this.buyQuantity.length <= 0) {
-          this.buyQuantity = "1";
-        }
-      },
-      // 数字键盘关闭
-      keyboardClose () {
-        let _this = this;
-        _this.$refs.popupGoodsSummary.$el.style.bottom = "50px";
-        _this.$refs.popupGoodsSummary.$el.style.transitionDuration = "0.15s";
-        setTimeout(function () {
-          _this.$refs.popupGoodsSummary.$el.style.transitionDuration = "0.3s";
-        }, 150);
       },
       // 购买数量函数
       buyQuantityClick () {
@@ -406,8 +359,7 @@
       }
     },
     created () {
-      let _this = this;
-      _this.getWxUserInfo();
+      this.getWxUserInfo();
     },
     mounted () {
       let _this = this;
@@ -540,47 +492,12 @@
     font-size: 13px;
   }
 
-  .number-count {
-    display: inline-block;
-    vertical-align: top;
-    position: relative;
-    width: 126px;
-    height: 34px;
-    overflow: hidden;
-  }
-
-  .number-count__quantity {
-    display: inline-block;
-    vertical-align: top;
-    width: 57px;
-    height: 34px;
-    padding: 4px 5px;
-    text-align: center;
-  }
-
-  .number-count__plus,
-  .number-count__less {
-    display: inline-block;
-    vertical-align: top;
-    width: 34px;
-    height: 34px;
-    line-height: 34px;
-    text-align: center;
-  }
-
-  .number-count__plus {
-    float: right;
-    background: url("../assets/img/icon/plus.png") no-repeat center center/16px #f7f7f7;
-  }
-
-  .number-count__less {
-    float: left;
-    background: url("../assets/img/icon/less.png") no-repeat center center/16px #f7f7f7;
-  }
-
   .app-footer {
     z-index: 2002;
-    position: relative;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     height: 50px;
 
     .van-submit-bar {
@@ -594,4 +511,9 @@
     overflow-y: visible;
   }
 
+  .buy-quantity /deep/ .van-stepper__input[disabled] {
+    color: #000;
+    background-color: #fff;
+    opacity: 1;
+  }
 </style>

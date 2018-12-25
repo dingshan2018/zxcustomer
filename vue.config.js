@@ -36,16 +36,6 @@ module.exports = {
       // 当使用 title 选项时，
       title   : '终端绑定'
     },
-    /*outPaper     : {
-      // page 的入口
-      entry   : 'src/pages/outPaper/main.js',
-      // 模板来源
-      template: 'public/index.html',
-      // 在 dist/index.html 的输出
-      filename: 'outPaper.html',
-      // 当使用 title 选项时，
-      title   : '终端绑定'
-    },*/
     personnelBind: {
       // page 的入口
       entry   : 'src/pages/personnelBind/main.js',
@@ -56,16 +46,6 @@ module.exports = {
       // 当使用 title 选项时，
       title   : '人员绑定'
     },
-    /*replaceBoard : {
-      // page 的入口
-      entry   : 'src/pages/replaceBoard/main.js',
-      // 模板来源
-      template: 'public/index.html',
-      // 在 dist/index.html 的输出
-      filename: 'replaceBoard.html',
-      // 当使用 title 选项时，
-      title   : '人员绑定'
-    },*/
     testOutPaper : {
       // page 的入口
       entry   : 'src/pages/testOutPaper/main.js',

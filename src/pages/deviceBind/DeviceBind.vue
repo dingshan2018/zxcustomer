@@ -11,8 +11,8 @@
       <div class="field-query">
         <van-field
           v-model="deviceCode"
-          label="设备号"
-          placeholder="填写设备号"
+          label="资产编号"
+          placeholder="填写资产编号"
           required
           clearable
           @click.native.stop/>

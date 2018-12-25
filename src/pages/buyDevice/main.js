@@ -19,6 +19,7 @@ import {
   SubmitBar,
   Popup,
   NumberKeyboard,
+  Stepper,
   Icon,
   Dialog,
   Loading,
@@ -52,6 +53,7 @@ Vue.use(Row).
   use(SubmitBar).
   use(Popup).
   use(NumberKeyboard).
+  use(Stepper).
   use(Icon).
   use(Dialog).
   use(Loading).
