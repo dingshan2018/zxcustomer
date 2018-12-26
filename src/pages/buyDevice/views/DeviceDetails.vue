@@ -238,7 +238,7 @@
           }
         }).then(function (res) {
           let data = res.data;
-          // alert("支付请求回调_____" + data);
+          // alert("支付请求回调_____" + JSON.stringify(data));
           if (parseInt(data.code) === 0) {
             _this.payData = data.data;
 
@@ -257,7 +257,8 @@
           }
           else {
             _this.$dialog.alert({
-              message: res.message
+              title: "系统发生错误",
+              message: data.message
             });
           }
         }).catch(function (error) {
@@ -265,7 +266,6 @@
             title: "系统发生错误",
             message: error
           });
-
         });
       },
       // 调用微信支付
