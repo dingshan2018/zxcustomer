@@ -6,8 +6,13 @@
         label="终端编号"
         disabled/>
 
-      <!--           icon="more-o"
-          @click-icon="devicePopup = true" -->
+      <van-field
+        v-model="activeType.name"
+        label="操作类型"
+        placeholder="选择操作类型"
+        required
+        @click.native="typeSheet = true"/>
+
       <div class="field-query">
         <van-field
           v-model="deviceCode"
@@ -27,15 +32,21 @@
           </ul>
         </div>
       </div>
-
     </van-cell-group>
 
     <van-button type="default"
                 class="submit-btn"
                 block
-                :disabled="!(!!termCode && !!deviceCode)"
+                :disabled="!(!!termCode && !!activeType && !!deviceCode)"
                 @click="submitClick">绑定
     </van-button>
+
+    <!-- 操作类型上拉菜单 -->
+    <van-actionsheet
+      v-model="typeSheet"
+      :actions="typeActions"
+      cancel-text="取消"
+      @select="typeSelect"/>
 
     <!-- 设备列表 -->
     <van-popup v-model="devicePopup" position="bottom">
@@ -51,26 +62,46 @@
 
 <script>
   export default {
-    name    : "deviceBind",
+    name: "deviceBind",
     data () {
       return {
+        // 用户信息
+        userInfo: {},
         // 终端号
-        termCode      : "",
+        termCode: "",
+        // 操作类型
+        activeType: {
+          name: "",
+          value: ""
+        },
+        // 类型上拉菜单
+        typeSheet: false,
+        // 类型上拉菜单的数据
+        typeActions: [
+          {
+            name: "激活",
+            value: "1"
+          },
+          {
+            name: "换版",
+            value: "2"
+          }
+        ],
         // 设备号
-        deviceCode    : "",
+        deviceCode: "",
         // 模糊查询列表点击时记录的旧设备号value
-        oldDeviceCode : "",
+        oldDeviceCode: "",
         // 模糊查询列表点击
         queryListClick: false,
         // 模糊查询设备列表
-        onlineDevice  : [],
+        onlineDevice: [],
         // 设备弹出层
-        devicePopup   : false,
+        devicePopup: false,
         // 设备选择器数据
         deviceCodeList: []
       };
     },
-    watch   : {
+    watch: {
       // 监听设备号，模糊查询
       "deviceCode": function (newV, oldV) {
         if (!oldV || oldV !== this.oldDeviceCode)
@@ -90,11 +121,65 @@
         return true;
       }
     },
-    methods : {
+    methods: {
+      // 微信用户信息
+      getWxUserInfo () {
+        let _this = this;
+        //获取公众号用户信息
+        let accessCode = globalTools.getUrlParam("code");
+        // alert("accessCode_____" + accessCode);
+        if (accessCode == null) {
+          //获取授权code的回调地址，获取到code，直接返回到当前页
+          let fromurl = location.href;
+          let url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx4e2cf38426225453&redirect_uri=" +
+            encodeURIComponent(fromurl) + "&response_type=code&scope=snsapi_userinfo&state=0#wechat_redirect";
+
+          location.href = url;
+        }
+        else {
+          // alert("请求/wx/userInfo_____");
+          _this.$axios.get("/wx/userInfo", {
+            params: {
+              code: accessCode,
+              state: 0
+            }
+          }).then(function (response) {
+            // alert("获取用户信息成功:" + JSON.stringify(response.data));
+            let data = response.data;
+
+            if (!data && !data.userInfo) return _this.$dialog.alert({
+              message: "获取用户信息失败"
+            });
+
+            // 用户数据
+            _this.userInfo = data.userInfo;
+
+            // alert("用户是否关注_____" + data.userInfo.subscribe);
+            // 用户未关注
+            if (!data.userInfo.subscribe) {
+              // location.href = "https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzAxNzcwODE2MA==&scene=110#wechat_redirect";
+              location.href = "https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzUyOTM0OTc2NQ==&scene=126#wechat_redirect";
+            }
+
+          }).catch(function (error) {
+            _this.$dialog.alert({
+              title: "系统发生错误",
+              message: error
+            });
+          });
+        }
+      },
       // appContainer点击
       appContainerClick () {
         if (!this.queryListClick)
           this.queryListClick = true;
+      },
+      // 类型选择事件
+      typeSelect (item) {
+        let _this = this;
+
+        _this.activeType = item;
+        _this.typeSheet = false;
       },
       // 获取设备号列表
       getDeviceCodeList () {
@@ -122,10 +207,10 @@
 
         _this.$axios.get("/wx/queryOnlineDevice", {
           params: {
-            deviceCode  : _this.deviceCode,
-            deviceStatus: "02",
-            pageNo      : "",
-            pageSize    : ""
+            deviceCode: _this.deviceCode,
+            deviceStatus: "01,02",
+            pageNo: "",
+            pageSize: ""
           }
         }).then(function (response) {
           let data = response.data;
@@ -155,16 +240,17 @@
         let _this = this;
 
         _this.$toast.loading({
-          duration   : 0,
+          duration: 0,
           forbidClick: true,
-          message    : "加载中..."
+          message: "加载中..."
         });
 
         _this.$axios.get("/wx/activeTerminal", {
           params: {
-            userId    : _this.userId,
-            termCode  : _this.termCode,
-            deviceCode: _this.deviceCode
+            userId: _this.userInfo.userId,
+            termCode: _this.termCode,
+            deviceCode: _this.deviceCode,
+            activeType: _this.activeType.value
           }
         }).then(function (response) {
           let data = response.data;
@@ -183,7 +269,9 @@
     },
     created () {
       this.termCode = globalTools.getUrlParam("termCode");
-      this.userId = globalTools.getUrlParam("userId");
+      let userId = globalTools.getUrlParam("userId");
+
+      userId ? this.userInfo.userId = userId : this.getWxUserInfo();
 
       // this.getDeviceCodeList();
     }

@@ -144,22 +144,37 @@
     </div>
   </div>
 
+  <script src="http://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script>
 
-    var userInfo = undefined;
+    var app = document.getElementById("app");
+    // 广告iframe
     var adFrame = document.getElementById("adFrame");
+    // 广告点击跳转链接
     var adLink = document.getElementById("adLink");
+    // 广告倒计时
     var adCountDown = document.getElementById("adCountDown");
+    // 出纸按钮
     var confirmBtn = document.getElementById("confirmBtn");
+    // url参数
+    var urlParam = {};
+    // 用户信息
+    var userInfo = {};
+    // jsapi_ticket
+    var wxTicket = {};
+    // 用户所在地理位置信息
+    var userLocation = {
+      latitude: "", // 纬度
+      longitude: "", // 经度
+      speed: "", // 速度
+      accuracy: "" // 位置精度
+    };
 
     // 获取微信用户信息
     function getWxUserInfo () {
-      //获取公众号用户信息
-      let accessCode = getUrlParam("code");
-      // alert("accessCode>>" + !accessCode);
-      // 未授权
-      if (!accessCode) {
+      // 用户未授权
+      if (!urlParam.code) {
         //获取授权code的回调地址，获取到code，直接返回到当前页
         location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx4e2cf38426225453&redirect_uri=" +
           encodeURIComponent(location.href) + "&response_type=code&scope=snsapi_userinfo&state=0#wechat_redirect";
@@ -167,16 +182,19 @@
       else {
         axios.get("/wx/userInfo", {
           params: {
-            code: accessCode,
+            code: urlParam.code,
             state: 0
           }
         }).then(function (response) {
           try {
             let data = response.data;
-            userInfo = data.userInfo;
-
+            // 扫码出纸当日达到限制次数
+            if (data.disableTissue) {
+              alert(data.disableMsg);
+              return WeixinJSBridge.call("closeWindow");
+            }
             // alert("userInfo>>" + JSON.stringify(data));
-
+            userInfo = data.userInfo;
             // 未关注
             if (!userInfo.subscribe) {
               return location.href = "https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzUyOTM0OTc2NQ==&scene=126#wechat_redirect";
@@ -186,26 +204,22 @@
               // 维修
               if (data.role.indexOf("SERVICEMAN") >= 0) {
                 // alert("维修");
-                return location.href = "/deviceBind.html?termCode=" + getUrlParam("termCode") + "&userId=" +
+                return location.href = "/deviceBind.html?termCode=" + urlParam.termCode + "&userId=" +
                   userInfo.userId;
               }
               // 补纸
               else if (data.role.indexOf("TISSUESMAN") >= 0) {
                 // alert("补纸");
-                return location.href = "/addPager.html?termCode=" + getUrlParam("termCode") + "&userId=" +
+                return location.href = "/addPager.html?termCode=" + urlParam.termCode + "&userId=" +
                   userInfo.userId;
               }
             }
-
             // alert("播广告");
-
             // 否则播放广告
-            document.getElementById("app").style.display = "block";
+            app.style.display = "block";
             adFrame.onload = adCountdownStart;
             confirmBtn.onclick = confirmBtnClick;
-
-            getAdInfo();
-
+            adFrame.src = urlParam.adSrc;
           } catch (e) {
             // alert("出错了>>" + e);
           }
@@ -215,13 +229,6 @@
 
         });
       }
-    }
-
-    // 获取广告信息
-    function getAdInfo () {
-      adFrame.src = getUrlParam("adSrc");
-      // alert("adSrc>>" + adFrame.src);
-      // adLink.href = getUrlParam('adLink');
     }
 
     // ad倒计时
@@ -246,16 +253,88 @@
     // 出纸
     function confirmBtnClick () {
       // alert("点击出纸");
-      axios.get(
-        "/wx/saveTissueRecord?termCode=" + getUrlParam("termCode") + "&wxUserId=" + userInfo.wxUserId + "&offerKey=" +
-        getUrlParam("offerKey")).then(function (response) {
+      axios.get("/wx/saveTissueRecord", {
+        params: {
+          termCode: urlParam.termCode,
+          wxUserId: userInfo.wxUserId,
+          offerKey: urlParam.offerKey,
+          scheduleId: urlParam.scheduleId,
+          tissueLat: userLocation.latitude,
+          tissueLon: userLocation.longitude
+        }
+      }).then(function (response) {
         alert("出纸成功");
         WeixinJSBridge.call("closeWindow");
-
       }).catch(function (error) {
-        // alert("出纸失败");
+        alert("系统发生错误！");
       });
     }
+
+    // 获取Ticket
+    function getTicket () {
+      axios.get("/wx/getTicket", {
+        params: {
+          url: location.href.split("#")[0]
+        }
+      }).then(function (resp) {
+        let respData = resp.data;
+        if (respData.wxJsapiSignature) {
+          wxTicket = respData.wxJsapiSignature;
+          getUserLocation();
+        }
+      }).catch(function (error) {
+        alert("系统发生错误！");
+      });
+    }
+
+    // 微信接口获取用户地理信息
+    function getUserLocation () {
+      // 微信接口获取地理位置信息
+      wx.config({
+        debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+        appId: wxTicket.appId, // 必填，公众号的唯一标识
+        timestamp: wxTicket.timestamp, // 必填，生成签名的时间戳
+        nonceStr: wxTicket.nonceStr, // 必填，生成签名的随机串
+        signature: wxTicket.signature,// 必填，签名
+        jsApiList: [getLocation] // 必填，需要使用的JS接口列表
+      });
+      // config验证通过后调用
+      wx.ready(function () {
+        // config信息验证后会执行ready方法，所有接口调用都必须在config接口获得结果之后，config是一个客户端的异步操作，所以如果需要在页面加载时就调用相关接口，则须把相关接口放在ready函数中调用来确保正确执行。对于用户触发时才调用的接口，则可以直接调用，不需要放在ready函数中。
+
+        // 获取地理位置接口
+        wx.getLocation({
+          type: "wgs84", // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+          success: function (res) {
+            userLocation.latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+            userLocation.longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+            userLocation.speed = res.speed; // 速度，以米/每秒计
+            userLocation.accuracy = res.accuracy; // 位置精度
+          }
+        });
+      });
+      // config验证失败后调用
+      wx.error(function (res) {
+        // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+      });
+    }
+
+    window.onload = function () {
+      // 获取公众号用户授权code
+      urlParam.code = getUrlParam("code");
+      // 设备终端号
+      urlParam.termCode = getUrlParam("termCode");
+      // 广告地址
+      urlParam.adSrc = getUrlParam("adSrc");
+      // 广告跳转链接
+      urlParam.href = getUrlParam("href");
+      // 出纸参数
+      urlParam.offerKey = getUrlParam("offerKey");
+      // 出纸参数
+      urlParam.scheduleId = getUrlParam("scheduleId");
+      // 获取微信用户信息
+      getWxUserInfo();
+    };
 
     function hasClass (elements, cName) {
       return !!elements.className.match(new RegExp("(\\s|^)" + cName + "(\\s|$)"));
@@ -284,11 +363,6 @@
         return null;
       }
     }
-
-    window.onload = function () {
-      getWxUserInfo();
-
-    };
 
   </script>
 </body>
