@@ -264,10 +264,15 @@
           tissueLon: userLocation.longitude
         }
       }).then(function (response) {
-        alert("出纸成功");
-        WeixinJSBridge.call("closeWindow");
+        var data = response.data;
+        if (data.code === 0) {
+          alert("出纸成功");
+          WeixinJSBridge.call("closeWindow");
+        } else {
+          alert("出纸失败，请再扫码尝试");
+        }
       }).catch(function (error) {
-        alert("系统发生错误！");
+        alert("出纸失败，请再扫码尝试");
       });
     }
 
