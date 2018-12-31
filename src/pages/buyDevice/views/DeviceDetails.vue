@@ -11,8 +11,14 @@
     <div class="app-main" ref="mainBScroll">
       <div>
         <van-swipe :autoplay="5000" class="goods-swipe">
-          <van-swipe-item v-for="src in goodsData.imgs">
-            <img class="swipe-img" :src="src">
+          <van-swipe-item>
+            <img class="swipe-img" src="../assets/img/background/slide_001.jpg">
+          </van-swipe-item>
+          <van-swipe-item>
+            <img class="swipe-img" src="../assets/img/background/slide_002.jpg">
+          </van-swipe-item>
+          <van-swipe-item>
+            <img class="swipe-img" src="../assets/img/background/slide_003.jpg">
           </van-swipe-item>
         </van-swipe>
 
@@ -377,9 +383,9 @@
           "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1541337717739&di=3b832a9ab3df64f36c0c92d6521bbdbd&imgtype=0&src=http%3A%2F%2Fh.hiphotos.baidu.com%2Fimage%2Fpic%2Fitem%2Fb999a9014c086e064a76b12f0f087bf40bd1cbfc.jpg"
         ],
         tag: "服务商",
-        name: "船舰",
-        price: "0.01",
-        reference: "0.1",
+        name: "鼎善智媒纸巾机",
+        price: "6800",
+        reference: "6800",
         surplus: "106",
         introduce: "商品介绍",
         parameter: "产品参数"

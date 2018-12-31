@@ -148,8 +148,7 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script>
 
-    // 用户信息
-    var userInfo = undefined;
+    var app = document.getElementById("app");
     // 广告iframe
     var adFrame = document.getElementById("adFrame");
     // 广告点击跳转链接
@@ -158,6 +157,10 @@
     var adCountDown = document.getElementById("adCountDown");
     // 出纸按钮
     var confirmBtn = document.getElementById("confirmBtn");
+    // url参数
+    var urlParam = {};
+    // 用户信息
+    var userInfo = {};
     // jsapi_ticket
     var wxTicket = {};
     // 用户所在地理位置信息
@@ -170,11 +173,8 @@
 
     // 获取微信用户信息
     function getWxUserInfo () {
-      //获取公众号用户信息
-      let accessCode = getUrlParam("code");
-      // alert("accessCode>>" + !accessCode);
-      // 未授权
-      if (!accessCode) {
+      // 用户未授权
+      if (!urlParam.code) {
         //获取授权code的回调地址，获取到code，直接返回到当前页
         location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx4e2cf38426225453&redirect_uri=" +
           encodeURIComponent(location.href) + "&response_type=code&scope=snsapi_userinfo&state=0#wechat_redirect";
@@ -182,16 +182,20 @@
       else {
         axios.get("/wx/userInfo", {
           params: {
-            code: accessCode,
+            code: urlParam.code,
+            termCode: urlParam.termCode,
             state: 0
           }
         }).then(function (response) {
           try {
             let data = response.data;
-            userInfo = data.userInfo;
-
+            // 扫码出纸当日达到限制次数
+            if (data.disableTissue) {
+              alert(data.disableMsg);
+              return WeixinJSBridge.call("closeWindow");
+            }
             // alert("userInfo>>" + JSON.stringify(data));
-
+            userInfo = data.userInfo;
             // 未关注
             if (!userInfo.subscribe) {
               return location.href = "https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzUyOTM0OTc2NQ==&scene=126#wechat_redirect";
@@ -201,26 +205,22 @@
               // 维修
               if (data.role.indexOf("SERVICEMAN") >= 0) {
                 // alert("维修");
-                return location.href = "/deviceBind.html?termCode=" + getUrlParam("termCode") + "&userId=" +
+                return location.href = "/deviceBind.html?termCode=" + urlParam.termCode + "&userId=" +
                   userInfo.userId;
               }
               // 补纸
               else if (data.role.indexOf("TISSUESMAN") >= 0) {
                 // alert("补纸");
-                return location.href = "/addPager.html?termCode=" + getUrlParam("termCode") + "&userId=" +
+                return location.href = "/addPager.html?termCode=" + urlParam.termCode + "&userId=" +
                   userInfo.userId;
               }
             }
-
             // alert("播广告");
-
             // 否则播放广告
-            document.getElementById("app").style.display = "block";
+            app.style.display = "block";
             adFrame.onload = adCountdownStart;
             confirmBtn.onclick = confirmBtnClick;
-
-            getAdInfo();
-
+            adFrame.src = urlParam.adSrc;
           } catch (e) {
             // alert("出错了>>" + e);
           }
@@ -230,13 +230,6 @@
 
         });
       }
-    }
-
-    // 获取广告信息
-    function getAdInfo () {
-      adFrame.src = getUrlParam("adSrc");
-      // alert("adSrc>>" + adFrame.src);
-      // adLink.href = getUrlParam('adLink');
     }
 
     // ad倒计时
@@ -263,10 +256,10 @@
       // alert("点击出纸");
       axios.get("/wx/saveTissueRecord", {
         params: {
-          termCode: getUrlParam("termCode"),
+          termCode: urlParam.termCode,
           wxUserId: userInfo.wxUserId,
-          offerKey: getUrlParam("offerKey"),
-          scheduleId: getUrlParam("scheduleId"),
+          offerKey: urlParam.offerKey,
+          scheduleId: urlParam.scheduleId,
           tissueLat: userLocation.latitude,
           tissueLon: userLocation.longitude
         }
@@ -328,8 +321,20 @@
     }
 
     window.onload = function () {
+      // 获取公众号用户授权code
+      urlParam.code = getUrlParam("code");
+      // 设备终端号
+      urlParam.termCode = getUrlParam("termCode");
+      // 广告地址
+      urlParam.adSrc = getUrlParam("adSrc");
+      // 广告跳转链接
+      urlParam.href = getUrlParam("href");
+      // 出纸参数
+      urlParam.offerKey = getUrlParam("offerKey");
+      // 出纸参数
+      urlParam.scheduleId = getUrlParam("scheduleId");
+      // 获取微信用户信息
       getWxUserInfo();
-
     };
 
     function hasClass (elements, cName) {
