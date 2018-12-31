@@ -183,6 +183,7 @@
         axios.get("/wx/userInfo", {
           params: {
             code: urlParam.code,
+            termCode: urlParam.termCode,
             state: 0
           }
         }).then(function (response) {
