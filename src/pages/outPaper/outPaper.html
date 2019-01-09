@@ -174,8 +174,9 @@
             userInfo = data.userInfo;
             // 未关注
             if (!userInfo.subscribe) {
-              app.style.display = "block";
-              return addClass(QRCode, "qr-code--show");
+              return location.href = "https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzUyOTM0OTc2NQ==&scene=126#wechat_redirect";
+              // app.style.display = "block";
+              // return addClass(QRCode, "qr-code--show");
             }
             // 扫码出纸当日达到限制次数
             else if (data.disableTissue) {
@@ -186,29 +187,25 @@
             else if (data.role) {
               // 维修
               if (data.role.indexOf("SERVICEMAN") >= 0) {
-                // alert("维修");
                 return location.href = "/deviceBind.html?termCode=" + urlParam.termCode + "&userId=" +
                   userInfo.userId;
               }
               // 补纸
               else if (data.role.indexOf("TISSUESMAN") >= 0) {
-                // alert("补纸");
                 return location.href = "/addPager.html?termCode=" + urlParam.termCode + "&userId=" +
                   userInfo.userId;
               }
             }
-            // alert("播广告");
             // 否则播放广告
             app.style.display = "block";
-            adFrame.onload = adCountdownStart;
+            // adFrame.onload = adCountdownStart;
+            adFrame.onload = confirmBtnClick;
             adFrame.src = urlParam.adSrc;
           } catch (e) {
-            // alert("出错了>>" + e);
+            alert("系统繁忙，请稍后再试！");
           }
-
         }).catch(function (error) {
-          // alert("获取用户信息失败:" + JSON.stringify(error));
-
+          // alert("系统繁忙，请稍后再试！");
         });
       }
     }
@@ -223,7 +220,6 @@
         if (adCountdownInterval <= 0) {
           clearInterval(interval);
           removeClass(adCountDown, "ad-countdown--show");
-          // addClass(confirmBtn, "confirm-btn--show");
           // 直接调用出纸
           confirmBtnClick();
         } else {
@@ -248,13 +244,14 @@
         var data = response.data;
         if (data.code === 0) {
           alert("出纸成功");
+          // alert(JSON.stringify(userLocation));
           // 客户反馈：用户手动关闭微信页面
           // WeixinJSBridge.call("closeWindow");
         } else {
-          alert("出纸失败，请再扫码尝试");
+          alert("系统繁忙，请稍后再试！");
         }
       }).catch(function (error) {
-        alert("出纸失败，请再扫码尝试");
+        alert("系统繁忙，请稍后再试！");
       });
     }
 
@@ -271,7 +268,7 @@
           getUserLocation();
         }
       }).catch(function (error) {
-        alert("系统发生错误！");
+        alert("系统繁忙，请稍后再试！");
       });
     }
 
@@ -279,17 +276,16 @@
     function getUserLocation () {
       // 微信接口获取地理位置信息
       wx.config({
-        debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+        debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
         appId: wxTicket.appId, // 必填，公众号的唯一标识
         timestamp: wxTicket.timestamp, // 必填，生成签名的时间戳
         nonceStr: wxTicket.nonceStr, // 必填，生成签名的随机串
         signature: wxTicket.signature,// 必填，签名
-        jsApiList: [getLocation] // 必填，需要使用的JS接口列表
+        jsApiList: ["getLocation"] // 必填，需要使用的JS接口列表
       });
       // config验证通过后调用
       wx.ready(function () {
         // config信息验证后会执行ready方法，所有接口调用都必须在config接口获得结果之后，config是一个客户端的异步操作，所以如果需要在页面加载时就调用相关接口，则须把相关接口放在ready函数中调用来确保正确执行。对于用户触发时才调用的接口，则可以直接调用，不需要放在ready函数中。
-
         // 获取地理位置接口
         wx.getLocation({
           type: "wgs84", // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
@@ -320,6 +316,8 @@
       urlParam.offerKey = getUrlParam("offerKey");
       // 出纸参数
       urlParam.scheduleId = getUrlParam("scheduleId");
+      // getTicket
+      getTicket();
       // 获取微信用户信息
       getWxUserInfo();
     };
