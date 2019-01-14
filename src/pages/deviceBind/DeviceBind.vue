@@ -208,9 +208,10 @@
         _this.$axios.get("/wx/queryOnlineDevice", {
           params: {
             deviceCode: _this.deviceCode,
-            deviceStatus: "01,02",
+            deviceStatus: "01,02,03",
             pageNo: "",
-            pageSize: ""
+            pageSize: "",
+            activeType: _this.activeType.value
           }
         }).then(function (response) {
           let data = response.data;
@@ -270,7 +271,6 @@
     created () {
       this.termCode = globalTools.getUrlParam("termCode");
       let userId = globalTools.getUrlParam("userId");
-
       userId ? this.userInfo.userId = userId : this.getWxUserInfo();
 
       // this.getDeviceCodeList();

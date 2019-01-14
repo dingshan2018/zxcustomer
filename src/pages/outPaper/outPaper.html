@@ -13,10 +13,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <script src="https://unpkg.com/lib-flexible@0.3.2/flexible.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/normalize.css@8.0.1/normalize.css">
-  <!--<script src="https://res.wx.qq.com/mmbizwap/zh_CN/htmledition/js/vconsole/3.0.0/vconsole.min.js"></script>
-  <script>
-    new VConsole();
-  </script>-->
   <style>
     html,
     body,
@@ -170,7 +166,6 @@
         }).then(function (response) {
           try {
             let data = response.data;
-            // alert("userInfo>>" + JSON.stringify(data));
             userInfo = data.userInfo;
             // 未关注
             if (!userInfo.subscribe) {
@@ -202,10 +197,10 @@
             adFrame.onload = confirmBtnClick;
             adFrame.src = urlParam.adSrc;
           } catch (e) {
-            alert("系统繁忙，请稍后再试！");
+            console.log(e);
           }
         }).catch(function (error) {
-          // alert("系统繁忙，请稍后再试！");
+          console.log(error);
         });
       }
     }
@@ -230,7 +225,6 @@
 
     // 出纸
     function confirmBtnClick () {
-      // alert("点击出纸");
       axios.get("/wx/saveTissueRecord", {
         params: {
           termCode: urlParam.termCode,
@@ -242,16 +236,11 @@
         }
       }).then(function (response) {
         var data = response.data;
-        if (data.code === 0) {
-          alert("出纸成功");
-          // alert(JSON.stringify(userLocation));
-          // 客户反馈：用户手动关闭微信页面
-          // WeixinJSBridge.call("closeWindow");
-        } else {
-          alert("系统繁忙，请稍后再试！");
-        }
+        alert(data.msg);
+        // 由用户手动关闭微信页面
+        // WeixinJSBridge.call("closeWindow");
       }).catch(function (error) {
-        alert("系统繁忙，请稍后再试！");
+        console.log("saveTissueRecord:出纸请求出错");
       });
     }
 
@@ -268,7 +257,7 @@
           getUserLocation();
         }
       }).catch(function (error) {
-        alert("系统繁忙，请稍后再试！");
+        console.log(error);
       });
     }
 
