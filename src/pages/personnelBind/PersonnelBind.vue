@@ -12,7 +12,7 @@
         disabled/>
 
     </van-cell-group>
-    <van-button type="default" class="submit-btn" block @click="submitClick">绑定</van-button>
+    <van-button type="default" class="submit-btn" :disabled="!userInfo.openId" block @click="submitClick">绑定</van-button>
   </div>
 </template>
 
@@ -53,6 +53,7 @@
             // alert(JSON.stringify(data));
             if (data) {
               _this.userInfo = data.userInfo;
+
             }
           }).catch(function (error) {
             // alert('获取用户信息失败:' + JSON.stringify(error));

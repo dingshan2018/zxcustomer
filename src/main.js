@@ -3,9 +3,9 @@
 // 测试出纸
 // import './pages/testOutPaper/main';
 // 设备绑定
-import './pages/deviceBind/main';
+// import './pages/deviceBind/main';
 // 人员绑定
-// import './pages/personnelBind/main'
+import './pages/personnelBind/main'
 // 购买设备
 // import './pages/buyDevice/main'
 // 换板激活
