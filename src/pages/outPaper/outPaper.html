@@ -138,6 +138,8 @@
     var urlParam = {};
     // 用户信息
     var userInfo = {};
+    // 用户当日出纸限制
+    var userDisableTissue = false;
     // jsapi_ticket
     var wxTicket = {};
     // 用户所在地理位置信息
@@ -167,16 +169,13 @@
           try {
             let data = response.data;
             userInfo = data.userInfo;
+            // 扫码出纸当日达到限制次数
+            userDisableTissue = data.disableTissue;
             // 未关注
             if (!userInfo.subscribe) {
               return location.href = "https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzUyOTM0OTc2NQ==&scene=126#wechat_redirect";
               // app.style.display = "block";
               // return addClass(QRCode, "qr-code--show");
-            }
-            // 扫码出纸当日达到限制次数
-            else if (data.disableTissue) {
-              alert(data.disableMsg);
-              return WeixinJSBridge.call("closeWindow");
             }
             // 已关注，角色判断
             else if (data.role) {
@@ -194,8 +193,10 @@
             // 否则播放广告
             app.style.display = "block";
             // adFrame.onload = adCountdownStart;
-            adFrame.onload = confirmBtnClick;
+            // adFrame.onload = confirmBtnClick;
             adFrame.src = urlParam.adSrc;
+            // 获取Ticket
+            getTicket();
           } catch (e) {
             console.log(e);
           }
@@ -225,6 +226,10 @@
 
     // 出纸
     function confirmBtnClick () {
+      // 扫码出纸当日达到限制次数
+      if (userDisableTissue) {
+        return alert(data.disableMsg);
+      }
       axios.get("/wx/saveTissueRecord", {
         params: {
           termCode: urlParam.termCode,
@@ -248,7 +253,7 @@
     function getTicket () {
       axios.get("/wx/getTicket", {
         params: {
-          url: location.href.split("#")[0]
+          url: location.href.split("#")[0].toString().replace(/&?code=\w*/, "").replace(/&?state=\w*/, "")
         }
       }).then(function (resp) {
         let respData = resp.data;
@@ -283,12 +288,14 @@
             userLocation.longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
             userLocation.speed = res.speed; // 速度，以米/每秒计
             userLocation.accuracy = res.accuracy; // 位置精度
+            confirmBtnClick();
           }
         });
       });
       // config验证失败后调用
       wx.error(function (res) {
         // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+        confirmBtnClick();
       });
     }
 
@@ -305,8 +312,6 @@
       urlParam.offerKey = getUrlParam("offerKey");
       // 出纸参数
       urlParam.scheduleId = getUrlParam("scheduleId");
-      // getTicket
-      getTicket();
       // 获取微信用户信息
       getWxUserInfo();
     };
