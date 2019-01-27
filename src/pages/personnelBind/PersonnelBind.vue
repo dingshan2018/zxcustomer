@@ -5,12 +5,10 @@
         v-model="name"
         label="用户名"
         disabled/>
-
       <van-field
         v-model="phone"
         label="手机号"
         disabled/>
-
     </van-cell-group>
     <van-button type="default" class="submit-btn" :disabled="!userInfo.openId" block @click="submitClick">绑定</van-button>
   </div>
@@ -18,12 +16,12 @@
 
 <script>
   export default {
-    name   : 'PersonnelBind',
+    name: "PersonnelBind",
     data () {
       return {
-        userId  : '',
-        name    : '',
-        phone   : '',
+        userId: "",
+        name: "",
+        phone: "",
         userInfo: {}
       };
     },
@@ -32,20 +30,20 @@
       getWxUserInfo () {
         let _this = this;
         //获取公众号用户信息
-        let accessCode = globalTools.getUrlParam('code');
+        let accessCode = globalTools.getUrlParam("code");
 
         if (accessCode == null) {
           //获取授权code的回调地址，获取到code，直接返回到当前页
           let fromurl = location.href;
-          let url = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx4e2cf38426225453&redirect_uri=' +
-            encodeURIComponent(fromurl) + '&response_type=code&scope=snsapi_userinfo&state=0#wechat_redirect';
+          let url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx4e2cf38426225453&redirect_uri=" +
+            encodeURIComponent(fromurl) + "&response_type=code&scope=snsapi_userinfo&state=0#wechat_redirect";
 
           location.href = url;
         }
         else {
-          _this.$axios.get('/wx/userInfo', {
+          _this.$axios.get("/wx/userInfo", {
             params: {
-              code : accessCode,
+              code: accessCode,
               state: 0
             }
           }).then(function (response) {
@@ -63,40 +61,43 @@
       // 绑定
       submitClick () {
         let _this = this;
-
         _this.$toast.loading({
-          duration   : 0,
+          duration: 0,
           forbidClick: true,
-          message    : '加载中...'
+          message: "加载中..."
         });
-
-        _this.$axios.get('/wx/bindWxUser', {
+        _this.$axios.get("/wx/bindWxUser", {
           params: {
             userId: _this.userId,
             openId: _this.userInfo.openId
           }
         })
-        .then(function (response) {
-          let data = response.data;
-          _this.$toast.success(data.error.message);
-
-          if (parseInt(data.code) === 0) {
-            setTimeout(function () {
+          .then(function (response) {
+            let data = response.data;
+            _this.$toast.clear();
+            if (parseInt(data.code) !== 0) {
+              return _this.$dialog.alert({
+                title: "操作失败",
+                message: data.error.message
+              });
+            }
+            _this.$dialog.alert({
+              title: "操作成功",
+              message: data.error.message
+            }).then(() => {
               WeixinJSBridge.call("closeWindow");
-            }, 3000);
-          }
-        })
-        .catch(function (error) {
-          _this.$toast.fail('系统繁忙！');
-
-        });
+            });
+          })
+          .catch(function (error) {
+            _this.$toast.fail("系统繁忙，请稍后再试！");
+          });
       }
     },
     created () {
       this.getWxUserInfo();
-      this.userId = globalTools.getUrlParam('userId');
-      this.name = globalTools.getUrlParam('name');
-      this.phone = globalTools.getUrlParam('phone');
+      this.userId = globalTools.getUrlParam("userId");
+      this.name = globalTools.getUrlParam("name");
+      this.phone = globalTools.getUrlParam("phone");
     }
   };
 </script>

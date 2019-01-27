@@ -5,7 +5,6 @@
         v-model="deviceCode"
         label="设备编号"
         disabled/>
-
     </van-cell-group>
     <van-button type="default" class="submit-btn" block @click="submitClick">测试出纸</van-button>
   </div>
@@ -22,33 +21,38 @@
     methods: {
       submitClick () {
         let _this = this;
-
         _this.$toast.loading({
           duration   : 0,
           forbidClick: true,
           message    : '加载中...'
         });
-
         _this.$axios.get('/deviceBind', {
           params: {
             deviceCode: _this.deviceCode
           }
         }).then(function (response) {
           let data = response.data;
-          _this.$toast.success(data.error.message);
-
-          if (parseInt(data.code) === 0) {
-            setTimeout(WeixinJSBridge.call('closeWindow'), 3000);
+          _this.$toast.clear();
+          if (parseInt(data.code) !== 0) {
+            return _this.$dialog.alert({
+              title: "操作失败",
+              message: data.error.message
+            });
           }
+          _this.$dialog.alert({
+            title: "操作成功",
+            message: data.error.message
+          }).then(() => {
+            WeixinJSBridge.call("closeWindow");
+          });
         }).catch(function (error) {
           _this.$toast.fail('系统繁忙！');
-
         });
       }
     },
     created () {
-      this.deviceCode = 'boardCode0123456';
-      // this.deviceCode = globalTools.getUrlParam('deviceCode');
+      // this.deviceCode = 'boardCode0123456';
+      this.deviceCode = globalTools.getUrlParam('deviceCode');
     }
   };
 </script>
