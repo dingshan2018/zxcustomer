@@ -7,8 +7,8 @@
 // 人员绑定
 // import './pages/personnelBind/main'
 // 购买设备
-// import './pages/buyDevice/main'
+import './pages/buyDevice/main'
 // 换板激活
-import './pages/replaceBoard/main'
+// import './pages/replaceBoard/main'
 // 补纸
 // import './pages/addPager/main'

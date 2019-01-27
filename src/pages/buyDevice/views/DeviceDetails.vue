@@ -7,7 +7,6 @@
         left-arrow
         @click-left="$router.back()"/>
     </div>
-
     <div class="app-main" ref="mainBScroll">
       <div>
         <van-swipe :autoplay="5000" class="goods-swipe">
@@ -21,7 +20,6 @@
             <img class="swipe-img" src="../assets/img/background/slide_003.jpg">
           </van-swipe-item>
         </van-swipe>
-
         <van-cell-group class="goods-info">
           <van-cell :border="false" style="font-size: 16px;">
             【{{goodsData.tag}}】 {{goodsData.name}}
@@ -31,16 +29,13 @@
             <span class="goods-info__reference">市场价：¥{{goodsData.reference}}</span>
           </van-cell>
         </van-cell-group>
-
         <van-cell title="商品规格"
                   is-link
                   class="goods-cell"
                   @click="popupGoodsSummary = true">
           <span>购买数量：{{buyQuantity}}</span>
         </van-cell>
-
         <van-cell title="购买历史" is-link class="goods-cell" to="/buyHistory"/>
-
         <div class="goods-desc-wrap">
           <van-cell title="商品介绍" class="goods-desc-title goods-cell van-hairline--top-bottom"/>
           <div class="goods-desc-content">
@@ -81,7 +76,6 @@
 
       </div>
     </div>
-
     <div class="app-footer van-hairline--top" @touchmove.stop.prevent>
       <van-submit-bar
         :price="buyTotalMoney"
@@ -89,7 +83,6 @@
         button-text="购买"
         @submit="wxpay"/>
     </div>
-
     <!-- 商品规格 -->
     <van-popup
       class="popup__goods-summary van-hairline--bottom"
@@ -110,7 +103,6 @@
           <span>剩余：{{goodsData.surplus}}</span>
         </p>
       </van-card>
-
       <van-cell title="数量" class="buy-quantity">
         <van-stepper
           v-model="buyQuantity"
@@ -121,7 +113,6 @@
           disable-input/>
       </van-cell>
       <van-cell>&nbsp;</van-cell>
-
     </van-popup>
   </div>
 </template>
@@ -172,7 +163,6 @@
       // 购买总金额
       buyTotalMoney () {
         let price = this.goodsData.price ? parseFloat(this.goodsData.price) * 100 : 0;
-
         return parseFloat(this.buyQuantity) * price;
       }
     },
@@ -231,10 +221,8 @@
       },
       // 请求后台预支付
       wxpay () {
-        // $.showLoading("正在加载...");
         let _this = this;
-        let total_fee = "1";
-        // alert("支付wxpay_____"+_this.userInfo);
+        let total_fee = parseFloat(_this.goodsData.price * _this.buyQuantity).toFixed(2);
         _this.$axios.get("/wx/wxpay/dingshanPay", {
           params: {
             total_fee: total_fee,
@@ -369,12 +357,10 @@
     },
     mounted () {
       let _this = this;
-
       // BScroll初始化
       _this.mainBScrollInstance = new _this.$BScroll(_this.$refs.mainBScroll, {
         click: true
       });
-
       // 获取设备详情
       _this.goodsData = {
         deviceId: _this.$route.params.deviceId,
@@ -384,15 +370,13 @@
         ],
         tag: "服务商",
         name: "鼎善智媒纸巾机",
-        price: "6800",
-        reference: "6800",
+        price: "6800.11",
+        reference: "6800.00",
         surplus: "106",
         introduce: "商品介绍",
         parameter: "产品参数"
       };
-
       // _this.getGoodsData();
-
     }
   };
 </script>

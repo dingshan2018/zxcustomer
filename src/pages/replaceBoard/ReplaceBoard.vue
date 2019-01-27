@@ -151,7 +151,7 @@
         }).then(function (response) {
           let data = response.data;
           _this.$toast.clear();
-          if (parseInt(data.code) !== 0) {
+          if (data.error.id === "9999") {
             return _this.$dialog.alert({
               title: "操作失败",
               message: data.error.message

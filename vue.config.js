@@ -5,56 +5,56 @@ module.exports = {
   outputDir          : 'consumer',
   // 打包的时候将pages的注释解开
   // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>
-  pages              : {
-    addPager     : {
+  pages: {
+    addPager: {
       // page 的入口
-      entry   : 'src/pages/addPager/main.js',
+      entry: "src/pages/addPager/main.js",
       // 模板来源
-      template: 'public/index.html',
+      template: "public/index.html",
       // 在 dist/index.html 的输出
-      filename: 'addPager.html',
+      filename: "addPager.html",
       // 当使用 title 选项时，
-      title   : '补纸'
+      title: "补纸"
     },
-    buyDevice    : {
+    buyDevice: {
       // page 的入口
-      entry   : 'src/pages/buyDevice/main.js',
+      entry: "src/pages/buyDevice/main.js",
       // 模板来源
-      template: 'public/index.html',
+      template: "public/index.html",
       // 在 dist/index.html 的输出
-      filename: 'buyDevice.html',
+      filename: "buyDevice.html",
       // 当使用 title 选项时，
-      title   : '设备购买'
+      title: "设备购买"
     },
-    deviceBind   : {
+    deviceBind: {
       // page 的入口
-      entry   : 'src/pages/deviceBind/main.js',
+      entry: "src/pages/deviceBind/main.js",
       // 模板来源
-      template: 'public/index.html',
+      template: "public/index.html",
       // 在 dist/index.html 的输出
-      filename: 'deviceBind.html',
+      filename: "deviceBind.html",
       // 当使用 title 选项时，
-      title   : '终端绑定'
+      title: "终端绑定"
     },
     personnelBind: {
       // page 的入口
-      entry   : 'src/pages/personnelBind/main.js',
+      entry: "src/pages/personnelBind/main.js",
       // 模板来源
-      template: 'public/index.html',
+      template: "public/index.html",
       // 在 dist/index.html 的输出
-      filename: 'personnelBind.html',
+      filename: "personnelBind.html",
       // 当使用 title 选项时，
-      title   : '人员绑定'
+      title: "人员绑定"
     },
-    testOutPaper : {
+    testOutPaper: {
       // page 的入口
-      entry   : 'src/pages/testOutPaper/main.js',
+      entry: "src/pages/testOutPaper/main.js",
       // 模板来源
-      template: 'public/index.html',
+      template: "public/index.html",
       // 在 dist/index.html 的输出
-      filename: 'testOutPaper.html',
+      filename: "testOutPaper.html",
       // 当使用 title 选项时，
-      title   : '测试出纸'
+      title: "测试出纸"
     }
   },
   // 不打包Map
