@@ -322,8 +322,6 @@
 </script>
 
 <style lang="less" scoped>
-  @base-green: #00c292;
-
   .field-query__list {
     position: relative;
 
@@ -365,6 +363,6 @@
     font-size: 18px;
     font-weight: 400;
     color: #fff;
-    background-color: @base-green;
+    background-color: #00c292;
   }
 </style>

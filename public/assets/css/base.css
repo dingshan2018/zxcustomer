@@ -1,0 +1,150 @@
+@charset "UTF-8";
+
+/* 重置元素属性与公共样式
+ ********************/
+*,
+*:before,
+*:after {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+a:link,
+a:visited,
+a:hover,
+a:active {
+  outline: none;
+  text-decoration: none;
+  color: inherit;
+}
+
+a,
+button,
+input,
+textarea {
+  border: none;
+  touch-action: manipulation;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+ul,
+li,
+iframe {
+  /* 使移动端滚动流畅 */
+  -webkit-overflow-scrolling: touch;
+}
+
+ul,
+li {
+  list-style: none;
+  padding-left: 0;
+}
+
+html,
+body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  margin: 0 auto;
+  /*padding: constant(safe-area-inset-top) constant(safe-area-inset-right) constant(safe-area-inset-bottom) constant(safe-area-inset-left);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);*/
+  line-height: 1;
+  font-family: -apple-system, 'PingFang SC Medium', 'Helvetica Neue', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* app内容
+  ********************/
+[v-cloak] {
+  display: none;
+}
+
+#app {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 720Px;
+  height: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+  user-select: none;
+}
+
+.app-container {
+  z-index: 10;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.block__clear-both::before,
+.block__clear-both::after {
+  content: '';
+  display: table;
+  width: 0;
+  height: 0;
+  visibility: hidden;
+}
+
+.block__clear-both::after {
+  clear: both;
+}
+
+/* 重写组件样式
+ ********************/
+.van-modal {
+  z-index: 2000 !important;
+}
+
+.van-nav-bar .van-icon,
+.van-nav-bar__text {
+  color: #333;
+}
+
+/*.van-swipe__indicator--active {
+  background-color: #00c292;
+}*/
+
+.van-dialog {
+  width: 270px;
+  border-radius: 7px;
+}
+
+.van-dialog__header {
+  font-size: 18px;
+  color: #000;
+}
+
+.van-dialog__message--has-title {
+  font-size: 15px;
+  color: #888;
+}
+
+.van-dialog .van-button {
+  font-size: 18px;
+}
+
+.van-dialog .van-dialog__confirm,
+.van-dialog .van-dialog__confirm:active {
+  color: #00c292;
+}
+
+.van-pull-refresh,
+.van-pull-refresh__track {
+  height: 100%;
+  overflow: auto;
+}
