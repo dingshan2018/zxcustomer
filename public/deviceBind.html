@@ -119,7 +119,8 @@
           v-model="typeSheet"
           :actions="typeActions"
           cancel-text="取消"
-          @select="typeSelect"/>
+          @select="typeSelect">
+        </van-actionsheet>
 
         <!-- 设备列表 -->
         <van-popup v-model="devicePopup" position="bottom">
@@ -128,7 +129,8 @@
                       show-toolbar
                       title="选择设备"
                       @cancel="devicePopup = false"
-                      @confirm="devicePickerConfirm"/>
+                      @confirm="devicePickerConfirm">
+          </van-picker>
         </van-popup>
       </template>
       <template v-if="role === 'FACTORY'">
