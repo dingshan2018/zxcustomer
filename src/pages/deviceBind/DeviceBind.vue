@@ -1,107 +1,118 @@
 <template>
   <div class="app-container" @touchmove.stop.prevent @click="appContainerClick">
-    <van-cell-group class="input-group">
-      <van-field
-        v-model="termCode"
-        label="终端编号"
-        disabled/>
-
-      <van-field
-        v-model="activeType.name"
-        label="操作类型"
-        placeholder="选择操作类型"
-        required
-        @click.native="typeSheet = true"/>
-
-      <div class="field-query">
+    <template v-if="role !== 'FACTORY'">
+      <van-cell-group class="input-group">
         <van-field
-          v-model="deviceCode"
-          label="资产编号"
-          placeholder="填写资产编号"
+          v-model="termCode"
+          label="终端编号"
+          disabled/>
+
+        <van-field
+          v-model="activeType.name"
+          label="操作类型"
+          placeholder="选择操作类型"
           required
-          clearable
-          @click.native.stop/>
+          @click.native="typeSheet = true"/>
 
-        <div class="field-query__list" v-show="queryListShow">
-          <ul @touchmove.stop>
-            <li class="field-query__item van-ellipsis van-hairline--bottom"
-                v-for="item in onlineDevice"
-                :key="item.deviceId"
-                @click.stop="onlineDeviceClick(item)">{{item.deviceSn}}
-            </li>
-          </ul>
+        <div class="field-query">
+          <van-field
+            v-model="deviceCode"
+            label="资产编号"
+            placeholder="填写资产编号"
+            required
+            clearable
+            @click.native.stop/>
+
+          <div class="field-query__list" v-show="queryListShow">
+            <ul @touchmove.stop>
+              <li class="field-query__item van-ellipsis van-hairline--bottom"
+                  v-for="item in onlineDevice"
+                  :key="item.deviceId"
+                  @click.stop="onlineDeviceClick(item)">{{item.deviceSn}}
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
-    </van-cell-group>
+      </van-cell-group>
 
-    <van-button type="default"
-                class="submit-btn"
-                block
-                :disabled="!(!!termCode && !!activeType && !!deviceCode)"
-                @click="submitClick">绑定
-    </van-button>
+      <van-button type="default"
+                  class="submit-btn"
+                  block
+                  :disabled="!(!!termCode && !!activeType && !!deviceCode)"
+                  @click="submitClick">绑定
+      </van-button>
 
-    <!-- 操作类型上拉菜单 -->
-    <van-actionsheet
-      v-model="typeSheet"
-      :actions="typeActions"
-      cancel-text="取消"
-      @select="typeSelect"/>
+      <!-- 操作类型上拉菜单 -->
+      <van-actionsheet
+        v-model="typeSheet"
+        :actions="typeActions"
+        cancel-text="取消"
+        @select="typeSelect"/>
 
-    <!-- 设备列表 -->
-    <van-popup v-model="devicePopup" position="bottom">
-      <van-picker :columns="deviceCodeList"
-                  value-key="code"
-                  show-toolbar
-                  title="选择设备"
-                  @cancel="devicePopup = false"
-                  @confirm="devicePickerConfirm"/>
-    </van-popup>
+      <!-- 设备列表 -->
+      <van-popup v-model="devicePopup" position="bottom">
+        <van-picker :columns="deviceCodeList"
+                    value-key="code"
+                    show-toolbar
+                    title="选择设备"
+                    @cancel="devicePopup = false"
+                    @confirm="devicePickerConfirm"/>
+      </van-popup>
+    </template>
+    <template v-if="role === 'FACTORY'">
+      <van-button type="default"
+                  class="submit-btn"
+                  block
+                  @click="onFactory">老化
+      </van-button>
+    </template>
   </div>
 </template>
 
 <script>
   export default {
-    name: "deviceBind",
+    name    : "deviceBind",
     data () {
       return {
         // 用户信息
-        userInfo: {},
+        userInfo      : {},
+        // 用户角色
+        role          : "",
         // 终端号
-        termCode: "",
+        termCode      : "",
         // 操作类型
-        activeType: {
-          name: "",
+        activeType    : {
+          name : "",
           value: ""
         },
         // 类型上拉菜单
-        typeSheet: false,
+        typeSheet     : false,
         // 类型上拉菜单的数据
-        typeActions: [
+        typeActions   : [
           {
-            name: "激活",
+            name : "激活",
             value: "1"
           },
           {
-            name: "换版",
+            name : "换版",
             value: "2"
           }
         ],
         // 设备号
-        deviceCode: "",
+        deviceCode    : "",
         // 模糊查询列表点击时记录的旧设备号value
-        oldDeviceCode: "",
+        oldDeviceCode : "",
         // 模糊查询列表点击
         queryListClick: false,
         // 模糊查询设备列表
-        onlineDevice: [],
+        onlineDevice  : [],
         // 设备弹出层
-        devicePopup: false,
+        devicePopup   : false,
         // 设备选择器数据
         deviceCodeList: []
       };
     },
-    watch: {
+    watch   : {
       // 监听设备号，模糊查询
       "deviceCode": function (newV, oldV) {
         if (!oldV || oldV !== this.oldDeviceCode)
@@ -115,13 +126,14 @@
       "queryListShow": function () {
         if (this.queryListClick) {
           return false;
-        } else if (!this.onlineDevice.length) {
+        }
+        else if (!this.onlineDevice.length) {
           return false;
         }
         return true;
       }
     },
-    methods: {
+    methods : {
       // 微信用户信息
       getWxUserInfo () {
         let _this = this;
@@ -132,7 +144,8 @@
           //获取授权code的回调地址，获取到code，直接返回到当前页
           let fromurl = location.href;
           let url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx4e2cf38426225453&redirect_uri=" +
-            encodeURIComponent(fromurl) + "&response_type=code&scope=snsapi_userinfo&state=0#wechat_redirect";
+            encodeURIComponent(fromurl) +
+            "&response_type=code&scope=snsapi_userinfo&state=0#wechat_redirect";
 
           location.href = url;
         }
@@ -140,19 +153,27 @@
           // alert("请求/wx/userInfo_____");
           _this.$axios.get("/wx/userInfo", {
             params: {
-              code: accessCode,
+              code : accessCode,
               state: 0
             }
           }).then(function (response) {
             // alert("获取用户信息成功:" + JSON.stringify(response.data));
             let data = response.data;
 
-            if (!data && !data.userInfo) return _this.$dialog.alert({
-              message: "获取用户信息失败"
-            });
+            if (!data && !data.userInfo) {
+              return _this.$dialog.alert({
+                message: "获取用户信息失败"
+              });
+            }
 
             // 用户数据
             _this.userInfo = data.userInfo;
+
+            // 角色 FACTORY
+            if (_this.userInfo.role &&
+              _this.userInfo.role.indexOf("FACTORY") !== -1) {
+              return _this.role = "FACTORY";
+            }
 
             // alert("用户是否关注_____" + data.userInfo.subscribe);
             // 用户未关注
@@ -163,7 +184,7 @@
 
           }).catch(function (error) {
             _this.$dialog.alert({
-              title: "系统发生错误",
+              title  : "系统发生错误",
               message: error
             });
           });
@@ -207,11 +228,11 @@
 
         _this.$axios.get("/wx/queryOnlineDevice", {
           params: {
-            deviceCode: _this.deviceCode,
+            deviceCode  : _this.deviceCode,
             deviceStatus: "01,02,03",
-            pageNo: "",
-            pageSize: "",
-            activeType: _this.activeType.value
+            pageNo      : "",
+            pageSize    : "",
+            activeType  : _this.activeType.value
           }
         }).then(function (response) {
           let data = response.data;
@@ -241,15 +262,15 @@
         let _this = this;
 
         _this.$toast.loading({
-          duration: 0,
+          duration   : 0,
           forbidClick: true,
-          message: "加载中..."
+          message    : "加载中..."
         });
 
         _this.$axios.get("/wx/activeTerminal", {
           params: {
-            userId: _this.userInfo.userId,
-            termCode: _this.termCode,
+            userId    : _this.userInfo.userId,
+            termCode  : _this.termCode,
             deviceCode: _this.deviceCode,
             activeType: _this.activeType.value
           }
@@ -266,6 +287,28 @@
           _this.$toast.fail("系统繁忙！");
 
         });
+      },
+      // 角色 FACTORY 按钮
+      onFactory () {
+        let _this = this;
+
+        _this.$toast.loading({
+          duration   : 0,
+          forbidClick: true,
+          message    : "加载中..."
+        });
+
+        _this.$axios.get("http://mp.dingscm.com/wx/factoryTest", {
+          params: {
+            userId  : _this.userInfo.userId,
+            termCode: _this.termCode
+          }
+        })
+          .then(function (response) {})
+          .catch(function (e) {})
+          .then(function () {
+            _this.$toast.clear();
+          });
       }
     },
     created () {

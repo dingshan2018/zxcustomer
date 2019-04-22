@@ -1,11 +1,9 @@
 module.exports = {
   // 基本Url
   baseUrl            : process.env.NODE_ENV === 'production' ? '././' : '/',
-  // 打包路径
-  outputDir          : 'consumer',
   // 打包的时候将pages的注释解开
   // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>
-  pages: {
+/*  pages: {
     addPager: {
       // page 的入口
       entry: "src/pages/addPager/main.js",
@@ -56,7 +54,7 @@ module.exports = {
       // 当使用 title 选项时，
       title: "测试出纸"
     }
-  },
+  },*/
   // 不打包Map
   productionSourceMap: false,
   devServer          : {
