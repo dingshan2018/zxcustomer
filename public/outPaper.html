@@ -298,11 +298,7 @@
           appId = data.appId;
           focusUrl = data.focusUrl;
           if (data.tissueTime) {
-            var timeDiff = new Date(data.tissueTime).getTime() -
-              new Date().getTime();
-            if (timeDiff > 0) {
-              outPageTissueTime = timeDiff;
-            }
+            outPageTissueTime = parseInt(data.tissueTime) * 1000;
           }
         }
       });
