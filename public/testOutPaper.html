@@ -258,7 +258,7 @@
       addClass(adCountDown, "ad-countdown--show");
       adCountDown.innerText = adCountdownInterval + "s";
 
-      let interval = setInterval(function () {
+      var interval = setInterval(function () {
         if (adCountdownInterval <= 0) {
           clearInterval(interval);
           removeClass(adCountDown, "ad-countdown--show");

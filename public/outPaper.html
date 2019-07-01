@@ -13,11 +13,6 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <script>
-    window.onerror = function (e) {
-      alert(e);
-    };
-  </script>
   <script src="./assets/lib/flexible/flexible.js"></script>
   <link rel="stylesheet" href="./assets/lib/normalize/normalize.css">
   <style>
@@ -116,7 +111,6 @@
   <div id="app" hidden>
     <span class="ad-countdown" id="adCountDown"></span>
     <iframe class="ad-frame"
-            sandbox="allow-forms allow-scripts allow-same-origin"
             id="adFrame"
             src=""
             frameborder="0"
@@ -150,17 +144,19 @@
         "s+": this.getSeconds(),                     //秒
         "q+": Math.floor((this.getMonth() + 3) / 3), //季度
         "S" : this.getMilliseconds()                  //毫秒
-      };
+      }
       if (/(y+)/.test(format))
         format = format.replace(RegExp.$1,
-          (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+          (this.getFullYear() + "").substr(4 - RegExp.$1.length)
+        )
       for (var k in o)
         if (new RegExp("(" + k + ")").test(format))
           format = format.replace(RegExp.$1,
             (RegExp.$1.length === 1) ? (o[k]) : (("00" + o[k]).substr(
-              ("" + o[k]).length)));
+              ("" + o[k]).length))
+          )
       return format;
-    };
+    }
 
     var app = document.getElementById("app");
     // 广告iframe
@@ -183,7 +179,7 @@
       longitude: "", // 经度
       speed    : "", // 速度
       accuracy : "" // 位置精度
-    };
+    }
     // 出纸标识
     var outPageFlag = false;
     // 出纸超时
@@ -197,7 +193,7 @@
         location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" +
           appId + "&redirect_uri=" +
           encodeURIComponent(location.href) +
-          "&response_type=code&scope=snsapi_userinfo&state=0#wechat_redirect";
+          "&response_type=code&scope=snsapi_userinfo&state=0#wechat_redirect"
       }
       else {
         $.ajax({
@@ -209,8 +205,6 @@
             state   : 0
           },
           success: function (data) {
-            alert("==>测试-获取用户信息<==：" + JSON.stringify(data));
-
             userInfo = data.userInfo;
             // 未关注
             if (!userInfo.subscribe) {
@@ -239,37 +233,39 @@
                   userInfo.userId;
               }
             }
-            // 否则播放广告
-            app.style.display = "block";
-            // adFrame.onload = adCountdownStart;
-            adFrame.onload = confirmBtnClick;
-            adFrame.src = urlParam.adSrc;
-            setTimeout(function () {
-              confirmBtnClick();
-            }, outPageTissueTime);
+            /*// 否则播放广告
+             app.style.display = 'block'
+             // adFrame.onload = adCountdownStart;
+             adFrame.onload = confirmBtnClick
+             adFrame.src = urlParam.adSrc
+             setTimeout(function () {
+             confirmBtnClick()
+             }, outPageTissueTime)*/
+
+            confirmBtnClick();
           }
-        });
+        })
       }
     }
 
     // ad倒计时
-    function adCountdownStart () {
-      var adCountdownInterval = 3;
-      addClass(adCountDown, "ad-countdown--show");
-      adCountDown.innerText = adCountdownInterval + "s";
-
-      let interval = setInterval(function () {
-        if (adCountdownInterval <= 0) {
-          clearInterval(interval);
-          removeClass(adCountDown, "ad-countdown--show");
-          // 直接调用出纸
-          confirmBtnClick();
-        }
-        else {
-          adCountDown.innerText = (--adCountdownInterval + "s");
-        }
-      }, 1000);
-    }
+    //function adCountdownStart () {
+    //  var adCountdownInterval = 3;
+    //  addClass(adCountDown, "ad-countdown--show");
+    //  adCountDown.innerText = adCountdownInterval + "s";
+    //
+    //    let interval = setInterval(function () {
+    //    if (adCountdownInterval <= 0) {
+    //      clearInterval(interval);
+    //      removeClass(adCountDown, "ad-countdown--show");
+    // 直接调用出纸
+    //     confirmBtnClick();
+    //   }
+    //   else {
+    //     adCountDown.innerText = (--adCountdownInterval + "s");
+    //   }
+    // }, 1000);
+    // }
 
     // 出纸
     function confirmBtnClick () {
@@ -278,8 +274,6 @@
         return;
       }
       outPageFlag = true;
-
-      alert("==>测试-发起出纸请求<==：");
 
       $.ajax({
         type   : "get",
@@ -293,10 +287,14 @@
           tissueLon : userLocation.longitude
         },
         success: function (data) {
+          setTimeout(function () {
+            urlParam.adSrc && location.replace(urlParam.adSrc);
+          }, 2000);
+          // alert(data.error.message)
           // 由用户手动关闭微信页面
           // WeixinJSBridge.call("closeWindow");
         }
-      });
+      })
     }
 
     // 获取公众号
@@ -306,15 +304,13 @@
         url    : "/wx/mpProperty",
         data   : {},
         success: function (data) {
-          alert("==>测试-获取公众号回调<==：" + JSON.stringify(data));
-
           appId = data.appId;
           focusUrl = data.focusUrl;
           if (data.tissueTime) {
             outPageTissueTime = parseInt(data.tissueTime) * 1000;
           }
         }
-      });
+      })
     }
 
     // 获取Ticket
@@ -326,14 +322,12 @@
           url: location.href.split("#")[0]
         },
         success: function (data) {
-          alert("==>测试-获取Ticket<==：" + JSON.stringify(data));
-
           if (data.wxJsapiSignature) {
             wxTicket = data.wxJsapiSignature;
             getUserLocation();
           }
         }
-      });
+      })
     }
 
     // 微信接口获取用户地理信息
@@ -346,7 +340,7 @@
         nonceStr : wxTicket.nonceStr, // 必填，生成签名的随机串
         signature: wxTicket.signature,// 必填，签名
         jsApiList: ["getLocation"] // 必填，需要使用的JS接口列表
-      });
+      })
       // config验证通过后调用
       wx.ready(function () {
         // config信息验证后会执行ready方法，所有接口调用都必须在config接口获得结果之后，config是一个客户端的异步操作，所以如果需要在页面加载时就调用相关接口，则须把相关接口放在ready函数中调用来确保正确执行。对于用户触发时才调用的接口，则可以直接调用，不需要放在ready函数中。
@@ -359,17 +353,15 @@
             userLocation.speed = res.speed; // 速度，以米/每秒计
             userLocation.accuracy = res.accuracy; // 位置精度
           }
-        });
-      });
+        })
+      })
       // config验证失败后调用
       wx.error(function (res) {
         // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
-      });
+      })
     }
 
     window.onload = function () {
-      alert("==>测试-onload<==：");
-
       mpProperty();
       // 获取公众号用户授权code
       urlParam.code = getUrlParam("code");
@@ -383,18 +375,15 @@
       urlParam.offerKey = getUrlParam("offerKey");
       // 出纸参数
       urlParam.scheduleId = getUrlParam("scheduleId");
-
-      alert("==>测试-onload参数<==：" + JSON.stringify(urlParam));
-
       // getTicket
       getTicket();
       // 获取微信用户信息
       getWxUserInfo();
-    };
+    }
 
     function hasClass (elements, cName) {
       return !!elements.className.match(
-        new RegExp("(\\s|^)" + cName + "(\\s|$)"));
+        new RegExp("(\\s|^)" + cName + "(\\s|$)"))
     }
 
     function addClass (elements, cName) {
@@ -406,7 +395,7 @@
     function removeClass (elements, cName) {
       if (this.hasClass(elements, cName)) {
         elements.className = elements.className.replace(
-          new RegExp("(\\s|^)" + cName + "(\\s|$)"), "");
+          new RegExp("(\\s|^)" + cName + "(\\s|$)"), "")
       }
     }
 
